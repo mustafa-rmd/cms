@@ -103,9 +103,8 @@ diagnostics:
 # External Provider Configuration
 external-providers:
   youtube:
-    api-key: ${YOUTUBE_API_KEY:your-youtube-api-key-here}
+    api-key: ${YOUTUBE_API_KEY:AIzaSyCKsXxKvJHRWEne4z_ffFrKS1v-y6WqBrM}
     base-url: https://www.googleapis.com/youtube/v3
-    channel-id: ${YOUTUBE_CHANNEL_ID:UCBJycsmduvYEL83R_U4JriQ} # Default to Google Developers channel
     max-results: 50
     timeout: 30000
   vimeo:

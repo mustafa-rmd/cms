@@ -34,10 +34,10 @@ public class YouTubeImportProvider implements ExternalProviderPort {
   @Override
   public List<ShowExternalDto> fetch(String topic, LocalDate startDate, LocalDate endDate) {
     log.info(
-        "Fetching YouTube content from {} to {} for channel: {}",
+        "Fetching YouTube content from {} to {} for topic: '{}'",
         startDate,
         endDate,
-        properties.getYoutube().getChannelId());
+        topic);
 
     validateConfiguration();
 
@@ -49,19 +49,19 @@ public class YouTubeImportProvider implements ExternalProviderPort {
 
       String url =
           "/search"
-              + "?part=snippet"
-              + "&channelId="
-              + properties.getYoutube().getChannelId()
+              + "?key="
+              + properties.getYoutube().getApiKey()
+              + "&q="
+              + java.net.URLEncoder.encode(topic, java.nio.charset.StandardCharsets.UTF_8)
+              + "&part=snippet,id"
+              + "&type=video"
+              + "&order=date"
+              + "&maxResults="
+              + properties.getYoutube().getMaxResults()
               + "&publishedAfter="
               + publishedAfter
               + "&publishedBefore="
-              + publishedBefore
-              + "&maxResults="
-              + properties.getYoutube().getMaxResults()
-              + "&order=date"
-              + "&type=video"
-              + "&key="
-              + properties.getYoutube().getApiKey();
+              + publishedBefore;
 
       log.debug("YouTube API URL: {}", url.replace(properties.getYoutube().getApiKey(), "***"));
 
@@ -96,8 +96,7 @@ public class YouTubeImportProvider implements ExternalProviderPort {
 
   @Override
   public boolean isAvailable() {
-    return StringUtils.hasText(properties.getYoutube().getApiKey())
-        && StringUtils.hasText(properties.getYoutube().getChannelId());
+    return StringUtils.hasText(properties.getYoutube().getApiKey());
   }
 
   @Override
@@ -113,9 +112,6 @@ public class YouTubeImportProvider implements ExternalProviderPort {
   private void validateConfiguration() {
     if (!StringUtils.hasText(properties.getYoutube().getApiKey())) {
       throw new ExternalProviderException(PROVIDER_NAME, "YouTube API key is not configured");
-    }
-    if (!StringUtils.hasText(properties.getYoutube().getChannelId())) {
-      throw new ExternalProviderException(PROVIDER_NAME, "YouTube channel ID is not configured");
     }
   }
 
