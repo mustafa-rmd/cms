@@ -1,0 +1,1229 @@
+{
+	"info": {
+		"_postman_id": "cms-service-collection",
+		"name": "CMS Service API",
+		"description": "Content Management System (CMS) Service API collection for managing shows (podcasts and documentaries)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8078",
+			"type": "string"
+		},
+		{
+			"key": "adminEmail",
+			"value": "admin@thmanyah.io",
+			"type": "string"
+		},
+		{
+			"key": "editorEmail",
+			"value": "editor@example.com",
+			"type": "string"
+		},
+		{
+			"key": "userEmail",
+			"value": "user@example.com",
+			"type": "string"
+		},
+		{
+			"key": "showId",
+			"value": "123e4567-e89b-12d3-a456-426614174000",
+			"type": "string"
+		},
+		{
+			"key": "userId",
+			"value": "123e4567-e89b-12d3-a456-426614174002",
+			"type": "string"
+		},
+		{
+			"key": "jobId",
+			"value": "123e4567-e89b-12d3-a456-426614174001",
+			"type": "string"
+		},
+		{
+			"key": "adminAccessToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "adminRefreshToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "editorAccessToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "editorRefreshToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "importTopic",
+			"value": "education",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login - Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('adminAccessToken', response.accessToken);",
+									"    pm.collectionVariables.set('adminRefreshToken', response.refreshToken);",
+									"    console.log('Admin tokens saved to collection variables');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"AdminPassword123!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Login - Editor",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('editorAccessToken', response.accessToken);",
+									"    pm.collectionVariables.set('editorRefreshToken', response.refreshToken);",
+									"    console.log('Editor tokens saved to collection variables');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{editorEmail}}\",\n  \"password\": \"EditorPassword123!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Refresh Token - Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('adminAccessToken', response.accessToken);",
+									"    pm.collectionVariables.set('adminRefreshToken', response.refreshToken);",
+									"    console.log('Admin tokens refreshed and saved');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refreshToken\": \"{{adminRefreshToken}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/refresh",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "auth", "refresh"]
+						}
+					}
+				},
+				{
+					"name": "Refresh Token - Editor",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('editorAccessToken', response.accessToken);",
+									"    pm.collectionVariables.set('editorRefreshToken', response.refreshToken);",
+									"    console.log('Editor tokens refreshed and saved');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refreshToken\": \"{{editorRefreshToken}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/refresh",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "auth", "refresh"]
+						}
+					}
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminAccessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/logout",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "auth", "logout"]
+						}
+					}
+				},
+				{
+					"name": "Login - Invalid Credentials (401)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@thmanyah.io\",\n  \"password\": \"WrongPassword\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "auth", "login"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Show Management",
+			"item": [
+				{
+					"name": "Create Show",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{editorAccessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"podcast\",\n  \"title\": \"The Tech Talk Show\",\n  \"description\": \"A weekly podcast about technology trends and innovations\",\n  \"language\": \"en\",\n  \"durationSec\": 3600,\n  \"publishedAt\": \"2024-01-15\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/shows",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "shows"]
+						}
+					}
+				},
+				{
+					"name": "Create Show - Duplicate Title (409)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{editorAccessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"documentary\",\n  \"title\": \"The Tech Talk Show\",\n  \"description\": \"This will fail because title already exists\",\n  \"language\": \"en\",\n  \"durationSec\": 2400,\n  \"publishedAt\": \"2024-01-16\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/shows",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "shows"]
+						}
+					}
+				},
+				{
+					"name": "Create Show - Validation Error (400)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{editorAccessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"invalid_type\",\n  \"title\": \"\",\n  \"description\": \"This will fail validation\",\n  \"language\": \"invalid\",\n  \"durationSec\": -100,\n  \"publishedAt\": \"2024-01-15\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/shows",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "shows"]
+						}
+					}
+				},
+				{
+					"name": "Get All Shows",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/shows?pageNumber=0&pageSize=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "shows"],
+							"query": [
+								{
+									"key": "pageNumber",
+									"value": "0"
+								},
+								{
+									"key": "pageSize",
+									"value": "10"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Show by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/shows/{{showId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "shows", "{{showId}}"]
+						}
+					}
+				},
+				{
+					"name": "Get Show by ID - Not Found (404)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/shows/123e4567-e89b-12d3-a456-426614174000",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "shows", "123e4567-e89b-12d3-a456-426614174000"]
+						}
+					}
+				},
+				{
+					"name": "Update Show",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{editorAccessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"podcast\",\n  \"title\": \"The Updated Tech Talk Show\",\n  \"description\": \"An updated weekly podcast about technology trends and innovations\",\n  \"language\": \"en\",\n  \"durationSec\": 3900,\n  \"publishedAt\": \"2024-01-15\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/shows/{{showId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "shows", "{{showId}}"]
+						}
+					}
+				},
+				{
+					"name": "Delete Show",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminAccessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/shows/{{showId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "shows", "{{showId}}"]
+						}
+					}
+				},
+				{
+					"name": "Delete Multiple Shows",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminAccessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\"show-id-1\", \"show-id-2\"]"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/shows",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "shows"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "User Management (ADMIN Only)",
+			"item": [
+				{
+					"name": "Create User - Editor",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminAccessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"editor@example.com\",\n  \"password\": \"EditorPassword123!\",\n  \"role\": \"EDITOR\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/users",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "users"]
+						}
+					}
+				},
+				{
+					"name": "Create User - Admin",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminAccessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin2@example.com\",\n  \"password\": \"AdminPassword123!\",\n  \"role\": \"ADMIN\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/users",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "users"]
+						}
+					}
+				},
+				{
+					"name": "Get All Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminAccessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/users?pageNumber=0&pageSize=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "users"],
+							"query": [
+								{
+									"key": "pageNumber",
+									"value": "0"
+								},
+								{
+									"key": "pageSize",
+									"value": "10"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Users by Role - ADMIN",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminAccessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/users/role/ADMIN?pageNumber=0&pageSize=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "users", "role", "ADMIN"],
+							"query": [
+								{
+									"key": "pageNumber",
+									"value": "0"
+								},
+								{
+									"key": "pageSize",
+									"value": "10"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Users by Role - EDITOR",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminAccessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/users/role/EDITOR?pageNumber=0&pageSize=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "users", "role", "EDITOR"],
+							"query": [
+								{
+									"key": "pageNumber",
+									"value": "0"
+								},
+								{
+									"key": "pageSize",
+									"value": "10"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Active Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminAccessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/users/active?pageNumber=0&pageSize=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "users", "active"],
+							"query": [
+								{
+									"key": "pageNumber",
+									"value": "0"
+								},
+								{
+									"key": "pageSize",
+									"value": "10"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get User by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminAccessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/users/{{userId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "users", "{{userId}}"]
+						}
+					}
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminAccessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"updated.editor@example.com\",\n  \"role\": \"EDITOR\",\n  \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/users/{{userId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "users", "{{userId}}"]
+						}
+					}
+				},
+				{
+					"name": "Delete User (Deactivate)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminAccessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/users/{{userId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "users", "{{userId}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Role-Based Access Examples",
+			"item": [
+				{
+					"name": "Create Show - ADMIN (Success)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminAccessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"podcast\",\n  \"title\": \"Admin Created Show\",\n  \"description\": \"A show created by admin user\",\n  \"language\": \"en\",\n  \"durationSec\": 3600,\n  \"publishedAt\": \"2024-01-15\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/shows",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "shows"]
+						}
+					}
+				},
+				{
+					"name": "Create Show - EDITOR (Success)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{editorAccessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"documentary\",\n  \"title\": \"Editor Created Show\",\n  \"description\": \"A show created by editor user\",\n  \"language\": \"en\",\n  \"durationSec\": 2400,\n  \"publishedAt\": \"2024-01-16\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/shows",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "shows"]
+						}
+					}
+				},
+				{
+					"name": "Delete Show - ADMIN (Success)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminAccessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/shows/{{showId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "shows", "{{showId}}"]
+						}
+					}
+				},
+				{
+					"name": "Delete Show - EDITOR (Should Fail)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{editorAccessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/shows/{{showId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "shows", "{{showId}}"]
+						}
+					}
+				},
+				{
+					"name": "Import from Vimeo - ADMIN (Success)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminAccessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"topic\": \"{{importTopic}}\",\n  \"startDate\": \"2024-01-01\",\n  \"endDate\": \"2024-01-31\",\n  \"skipDuplicates\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/import/vimeo",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "import", "vimeo"]
+						}
+					}
+				},
+				{
+					"name": "Import from Vimeo - EDITOR (Should Fail)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{editorAccessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"topic\": \"{{importTopic}}\",\n  \"startDate\": \"2024-01-01\",\n  \"endDate\": \"2024-01-31\",\n  \"skipDuplicates\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/import/vimeo",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "import", "vimeo"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Filtering and Search",
+			"item": [
+				{
+					"name": "Get Shows by Type",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/shows/type/podcast?pageNumber=0&pageSize=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "shows", "type", "podcast"],
+							"query": [
+								{
+									"key": "pageNumber",
+									"value": "0"
+								},
+								{
+									"key": "pageSize",
+									"value": "10"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Shows by Language",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/shows/language/en?pageNumber=0&pageSize=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "shows", "language", "en"],
+							"query": [
+								{
+									"key": "pageNumber",
+									"value": "0"
+								},
+								{
+									"key": "pageSize",
+									"value": "10"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Shows by Provider",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/shows/provider/vimeo?pageNumber=0&pageSize=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "shows", "provider", "vimeo"],
+							"query": [
+								{
+									"key": "pageNumber",
+									"value": "0"
+								},
+								{
+									"key": "pageSize",
+									"value": "10"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Shows by Provider - Internal",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/shows/provider/internal?pageNumber=0&pageSize=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "shows", "provider", "internal"],
+							"query": [
+								{
+									"key": "pageNumber",
+									"value": "0"
+								},
+								{
+									"key": "pageSize",
+									"value": "10"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Shows by Provider - YouTube",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/shows/provider/youtube?pageNumber=0&pageSize=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "shows", "provider", "youtube"],
+							"query": [
+								{
+									"key": "pageNumber",
+									"value": "0"
+								},
+								{
+									"key": "pageSize",
+									"value": "10"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Search Shows by Title",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/shows/search?title=tech&pageNumber=0&pageSize=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "shows", "search"],
+							"query": [
+								{
+									"key": "title",
+									"value": "tech"
+								},
+								{
+									"key": "pageNumber",
+									"value": "0"
+								},
+								{
+									"key": "pageSize",
+									"value": "10"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Shows by Published Date",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/shows/published/2024-01-15?pageNumber=0&pageSize=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "shows", "published", "2024-01-15"],
+							"query": [
+								{
+									"key": "pageNumber",
+									"value": "0"
+								},
+								{
+									"key": "pageSize",
+									"value": "10"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Shows by Creator",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/shows/creator/{{userEmail}}?pageNumber=0&pageSize=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "shows", "creator", "{{userEmail}}"],
+							"query": [
+								{
+									"key": "pageNumber",
+									"value": "0"
+								},
+								{
+									"key": "pageSize",
+									"value": "10"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Metadata and Statistics",
+			"item": [
+				{
+					"name": "Get Distinct Fields",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/shows/filtering-values",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "shows", "filtering-values"]
+						}
+					}
+				},
+				{
+					"name": "Get Show Statistics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/shows/statistics",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "shows", "statistics"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Import Operations",
+			"item": [
+				{
+					"name": "Import from YouTube",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminAccessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"topic\": \"{{importTopic}}\",\n  \"startDate\": \"2024-01-01\",\n  \"endDate\": \"2024-01-31\",\n  \"skipDuplicates\": true,\n  \"batchSize\": 10\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/import/youtube",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "import", "youtube"]
+						}
+					}
+				},
+				{
+					"name": "Import from Vimeo",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminAccessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"topic\": \"{{importTopic}}\",\n  \"startDate\": \"2024-01-01\",\n  \"endDate\": \"2024-01-31\",\n  \"skipDuplicates\": true,\n  \"batchSize\": 10\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/import/vimeo",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "import", "vimeo"]
+						}
+					}
+				},
+				{
+					"name": "Import from Mock Provider",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminAccessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"topic\": \"{{importTopic}}\",\n  \"startDate\": \"2024-01-01\",\n  \"endDate\": \"2024-01-31\",\n  \"skipDuplicates\": true,\n  \"batchSize\": 5\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/import/mock",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "import", "mock"]
+						}
+					}
+				},
+				{
+					"name": "Get Import Job Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/import/jobs/{{jobId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "import", "jobs", "{{jobId}}"]
+						}
+					}
+				},
+				{
+					"name": "Cancel Import Job",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminAccessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/import/jobs/{{jobId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "import", "jobs", "{{jobId}}"]
+						}
+					}
+				},
+				{
+					"name": "Get All Import Jobs",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/import/jobs",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "import", "jobs"]
+						}
+					}
+				},
+				{
+					"name": "Get Available Providers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/import/providers",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "import", "providers"]
+						}
+					}
+				},
+				{
+					"name": "Check Provider Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/import/providers/youtube/health",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "import", "providers", "youtube", "health"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Health and Monitoring",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/actuator/health",
+							"host": ["{{baseUrl}}"],
+							"path": ["actuator", "health"]
+						}
+					}
+				},
+				{
+					"name": "Application Info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/actuator/info",
+							"host": ["{{baseUrl}}"],
+							"path": ["actuator", "info"]
+						}
+					}
+				},
+				{
+					"name": "Swagger UI",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/swagger-ui.html",
+							"host": ["{{baseUrl}}"],
+							"path": ["swagger-ui.html"]
+						}
+					}
+				},
+				{
+					"name": "OpenAPI Docs",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/v3/api-docs",
+							"host": ["{{baseUrl}}"],
+							"path": ["v3", "api-docs"]
+						}
+					}
+				}
+			]
+		}
+	]
+}

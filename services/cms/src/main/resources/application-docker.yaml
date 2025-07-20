@@ -1,0 +1,29 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:postgres}:${POSTGRES_PORT:5432}/${POSTGRES_DATABASE:cms_db}?currentSchema=${CMS_SCHEMA:public}
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
+  flyway:
+    url: jdbc:postgresql://${POSTGRES_HOST:postgres}:${POSTGRES_PORT:5432}/${POSTGRES_DATABASE:cms_db}?currentSchema=${CMS_SCHEMA:public}
+    user: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
+
+  # RabbitMQ Configuration for Docker
+  rabbitmq:
+    host: ${RABBITMQ_HOST:rabbitmq}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+    virtual-host: ${RABBITMQ_VIRTUAL_HOST:/}
+
+logging:
+  level:
+    root: INFO
+    org:
+      springframework:
+        hibernate:
+          SQL: INFO
+          type:
+            descriptor:
+              sql:
+                BasicBinder: INFO

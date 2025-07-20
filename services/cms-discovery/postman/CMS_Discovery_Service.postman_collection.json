@@ -1,0 +1,757 @@
+{
+	"info": {
+		"_postman_id": "cms-discovery-api-collection",
+		"name": "CMS Discovery Service API",
+		"description": "Public read-only API for searching and discovering content from the CMS Discovery service. This service provides fast, scalable search capabilities powered by Elasticsearch.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "cms-discovery-v1"
+	},
+	"item": [
+		{
+			"name": "Search Operations",
+			"item": [
+				{
+					"name": "Basic Text Search",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/search?query=artificial intelligence&page=0&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "search"],
+							"query": [
+								{
+									"key": "query",
+									"value": "artificial intelligence",
+									"description": "Search query text"
+								},
+								{
+									"key": "page",
+									"value": "0",
+									"description": "Page number (0-based)"
+								},
+								{
+									"key": "size",
+									"value": "10",
+									"description": "Number of results per page"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Advanced Search with Filters",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/search?query=technology&type=podcast&language=en&minDuration=300&maxDuration=3600&sortBy=rating&sortDirection=desc&page=0&size=20",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "search"],
+							"query": [
+								{
+									"key": "query",
+									"value": "technology",
+									"description": "Search query"
+								},
+								{
+									"key": "type",
+									"value": "podcast",
+									"description": "Content type filter"
+								},
+								{
+									"key": "language",
+									"value": "en",
+									"description": "Language filter"
+								},
+								{
+									"key": "minDuration",
+									"value": "300",
+									"description": "Minimum duration in seconds"
+								},
+								{
+									"key": "maxDuration",
+									"value": "3600",
+									"description": "Maximum duration in seconds"
+								},
+								{
+									"key": "sortBy",
+									"value": "rating",
+									"description": "Sort field"
+								},
+								{
+									"key": "sortDirection",
+									"value": "desc",
+									"description": "Sort direction"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search with Tags and Categories",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/search?query=machine learning&tags=ai,technology&categories=Science,Technology&provider=youtube&page=0&size=15",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "search"],
+							"query": [
+								{
+									"key": "query",
+									"value": "machine learning"
+								},
+								{
+									"key": "tags",
+									"value": "ai,technology",
+									"description": "Comma-separated tags"
+								},
+								{
+									"key": "categories",
+									"value": "Science,Technology",
+									"description": "Comma-separated categories"
+								},
+								{
+									"key": "provider",
+									"value": "youtube",
+									"description": "Content provider filter"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "15"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search with Date Range",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/search?query=documentary&publishedAfter=2024-01-01&publishedBefore=2024-12-31&minRating=4.0&sortBy=publishedAt&sortDirection=desc",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "search"],
+							"query": [
+								{
+									"key": "query",
+									"value": "documentary"
+								},
+								{
+									"key": "publishedAfter",
+									"value": "2024-01-01",
+									"description": "Published after date (yyyy-MM-dd)"
+								},
+								{
+									"key": "publishedBefore",
+									"value": "2024-12-31",
+									"description": "Published before date (yyyy-MM-dd)"
+								},
+								{
+									"key": "minRating",
+									"value": "4.0",
+									"description": "Minimum rating filter"
+								},
+								{
+									"key": "sortBy",
+									"value": "publishedAt"
+								},
+								{
+									"key": "sortDirection",
+									"value": "desc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Advanced Search (POST)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"artificial intelligence\",\n  \"type\": \"podcast\",\n  \"language\": \"en\",\n  \"tags\": [\"technology\", \"ai\", \"future\"],\n  \"categories\": [\"Science\", \"Technology\"],\n  \"minDuration\": 600,\n  \"maxDuration\": 7200,\n  \"publishedAfter\": \"2024-01-01\",\n  \"minRating\": 3.5,\n  \"sortBy\": \"rating\",\n  \"sortDirection\": \"desc\",\n  \"page\": 0,\n  \"size\": 25,\n  \"highlight\": true,\n  \"fuzzy\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/search",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "search"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Browse All Content (No Query)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/search?sortBy=createdDate&sortDirection=desc&page=0&size=20",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "search"],
+							"query": [
+								{
+									"key": "sortBy",
+									"value": "createdDate",
+									"description": "Sort by creation date"
+								},
+								{
+									"key": "sortDirection",
+									"value": "desc"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Content Discovery",
+			"item": [
+				{
+					"name": "Get Show by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/shows/{{showId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "shows", "{{showId}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Popular Shows",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/shows/popular?page=0&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "shows", "popular"],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Recent Shows",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/shows/recent?page=0&size=15",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "shows", "recent"],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "15"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Content Filtering",
+			"item": [
+				{
+					"name": "Get Shows by Type - Podcasts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/shows/type/podcast?page=0&size=20",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "shows", "type", "podcast"],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Shows by Type - Documentaries",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/shows/type/documentary?page=0&size=20",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "shows", "type", "documentary"],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Shows by Tag",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/shows/tag/{{tag}}?page=0&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "shows", "tag", "{{tag}}"],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Shows by Category",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/shows/category/{{category}}?page=0&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "shows", "category", "{{category}}"],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Search Examples & Edge Cases",
+			"item": [
+				{
+					"name": "Empty Query (Browse All)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/search?page=0&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "search"],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fuzzy Search (Typos)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/search?query=artifical inteligence&fuzzy=true&highlight=true",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "search"],
+							"query": [
+								{
+									"key": "query",
+									"value": "artifical inteligence",
+									"description": "Query with typos"
+								},
+								{
+									"key": "fuzzy",
+									"value": "true",
+									"description": "Enable fuzzy search"
+								},
+								{
+									"key": "highlight",
+									"value": "true",
+									"description": "Enable highlighting"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Large Page Size (Max 100)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/search?query=technology&size=100&page=0",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "search"],
+							"query": [
+								{
+									"key": "query",
+									"value": "technology"
+								},
+								{
+									"key": "size",
+									"value": "100",
+									"description": "Maximum allowed page size"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invalid Page Size (Should Return 400)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/search?query=test&size=150&page=0",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "search"],
+							"query": [
+								{
+									"key": "query",
+									"value": "test"
+								},
+								{
+									"key": "size",
+									"value": "150",
+									"description": "Exceeds maximum page size"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sort by Different Fields",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/search?query=podcast&sortBy=viewCount&sortDirection=desc&page=0&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "search"],
+							"query": [
+								{
+									"key": "query",
+									"value": "podcast"
+								},
+								{
+									"key": "sortBy",
+									"value": "viewCount",
+									"description": "Sort by view count"
+								},
+								{
+									"key": "sortDirection",
+									"value": "desc"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Complex Filter Combination",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"science\",\n  \"type\": \"documentary\",\n  \"language\": \"en\",\n  \"provider\": \"youtube\",\n  \"tags\": [\"science\", \"education\", \"research\"],\n  \"categories\": [\"Science\", \"Education\"],\n  \"minDuration\": 1800,\n  \"maxDuration\": 5400,\n  \"publishedAfter\": \"2023-01-01\",\n  \"publishedBefore\": \"2024-12-31\",\n  \"minRating\": 4.0,\n  \"sortBy\": \"rating\",\n  \"sortDirection\": \"desc\",\n  \"page\": 0,\n  \"size\": 20,\n  \"highlight\": true,\n  \"fuzzy\": false\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/search",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "search"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "API Documentation",
+			"item": [
+				{
+					"name": "Swagger UI",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/swagger-ui.html",
+							"host": ["{{baseUrl}}"],
+							"path": ["swagger-ui.html"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "OpenAPI JSON",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/v3/api-docs",
+							"host": ["{{baseUrl}}"],
+							"path": ["v3", "api-docs"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Health & Monitoring",
+			"item": [
+				{
+					"name": "Service Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/actuator/health",
+							"host": ["{{baseUrl}}"],
+							"path": ["actuator", "health"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Service Info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/actuator/info",
+							"host": ["{{baseUrl}}"],
+							"path": ["actuator", "info"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Service Metrics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/actuator/metrics",
+							"host": ["{{baseUrl}}"],
+							"path": ["actuator", "metrics"]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8079",
+			"type": "string"
+		},
+		{
+			"key": "showId",
+			"value": "123e4567-e89b-12d3-a456-426614174000",
+			"type": "string"
+		},
+		{
+			"key": "tag",
+			"value": "technology",
+			"type": "string"
+		},
+		{
+			"key": "category",
+			"value": "Science",
+			"type": "string"
+		}
+	]
+}

@@ -1,0 +1,139 @@
+server:
+  port: ${CMS_SERVICE_PORT:8078}
+
+springdoc:
+  api-docs:
+    version: "openapi_3_0"
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+logging:
+  level:
+    root: INFO
+    org:
+      springframework:
+        boot:
+          autoconfigure:
+            web:
+              reactive: WARN
+        cloud:
+          gateway: WARN
+        hibernate:
+          SQL: DEBUG
+          type:
+            descriptor:
+              sql:
+                BasicBinder: INFO
+
+spring:
+  application:
+    name: ${CMS_SERVICE_NAME:cms}
+  flyway:
+    enabled: ${FLYWAY_MIGRATION_ENABLED:true}
+    locations: classpath:db/migration
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DATABASE:cms_db}?currentSchema=${CMS_SCHEMA:public}
+    user: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
+    baseline-on-migrate: true
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DATABASE:cms_db}?currentSchema=${CMS_SCHEMA:public}
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
+  jpa:
+    open-in-view: false
+    show-sql: ${JPA_SHOW_SQL:true}
+    properties:
+      hibernate:
+        format_sql: true
+    database: postgresql
+    hibernate:
+      ddl-auto: ${JPA_DDL_AUTO:update}
+
+  # RabbitMQ Configuration
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+    virtual-host: ${RABBITMQ_VIRTUAL_HOST:/}
+
+  cloud:
+    loadbalancer:
+      ribbon:
+        enabled: false
+    kubernetes:
+      loadbalancer:
+        mode: service
+      discovery:
+        all-namespaces: false
+  sql.init.mode: always
+
+hystrix:
+  command:
+    default:
+      execution:
+        timeout:
+          enabled: true
+        isolation:
+          thread:
+            timeoutInMilliseconds: 10000
+      circuitBreaker:
+        requestVolumeThreshold: 5
+        errorThresholdPercentage: 50
+        sleepWindowInMilliseconds: 10000
+      metrics:
+        rollingStats:
+          timeInMilliseconds: 10000
+
+diagnostics:
+  service-name: "cms"
+  version: ${VERSION:0.0.1-dev}
+  build-timestamp: ${BUILD_TIMESTAMP:1970-01-01T00:00:00Z}
+  git-hash: ${GIT_HASH:unknown}
+  git-branch: ${GIT_BRANCH:main}
+  git-commit-timestamp: ${GIT_COMMIT_TIMESTAMP:1970-01-01T00:00:00Z}
+
+# External Provider Configuration
+external-providers:
+  youtube:
+    api-key: ${YOUTUBE_API_KEY:your-youtube-api-key-here}
+    base-url: https://www.googleapis.com/youtube/v3
+    channel-id: ${YOUTUBE_CHANNEL_ID:UCBJycsmduvYEL83R_U4JriQ} # Default to Google Developers channel
+    max-results: 50
+    timeout: 30000
+  vimeo:
+    client-id: ${VIMEO_CLIENT_ID:086c9832e5a68549a67112c312cf8a7d314666d5}
+    client-secret: ${VIMEO_CLIENT_SECRET:89g3yXwK3m+oZ/zq9emYXDD83LkITCAOJC7fQUIIsw2WmQqYuIaNwmZsN+4BrE++zkhcxUgf+SwhmXzkU/ttNUcgCgw8CtGvXrtPKIpCTc9E+1qlzY4QcQ3Xp7Uawnvc}
+    base-url: https://api.vimeo.com
+    oauth-url: https://api.vimeo.com/oauth/authorize/client
+    max-results: 50
+    timeout: 30000
+  mock:
+    enabled: ${MOCK_PROVIDER_ENABLED:true}
+
+# Initial Admin User Configuration
+cms:
+  admin:
+    email: ${CMS_ADMIN_EMAIL:admin@thmanyah.io}
+    password: ${CMS_ADMIN_PASSWORD:AdminPassword123!} # Plain text password (will be hashed on startup)
+    enabled: ${CMS_ADMIN_ENABLED:true}
+
+  # Event Publishing Configuration
+  events:
+    rabbitmq:
+      exchange: ${CMS_EVENTS_EXCHANGE:cms.events}
+      routing-key:
+        show-created: ${CMS_SHOW_CREATED_ROUTING_KEY:show.created}
+        show-updated: ${CMS_SHOW_UPDATED_ROUTING_KEY:show.updated}
+        show-deleted: ${CMS_SHOW_DELETED_ROUTING_KEY:show.deleted}
+  jwt:
+    secret: ${JWT_SECRET:mySecretKey1234567890123456789012345678901234567890} # Must be at least 256 bits (32 chars)
+    expiration: ${JWT_EXPIRATION:86400000} # 24 hours in milliseconds
+    refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000} # 7 days in milliseconds
