@@ -1,10 +1,10 @@
 # CMS Service Postman Collection
 
-This Postman collection provides comprehensive API testing for the Thmanyah Content Management System (CMS) Service.
+This Postman collection provides comprehensive API testing for the Thmanyah Content Management System (CMS) Service, including the new **Async Import Operations** with background job processing using RabbitMQ.
 
 ## Overview
 
-The CMS Service manages shows (podcasts and documentaries) with full CRUD operations, filtering capabilities, user management, and external content import functionality.
+The CMS Service manages shows (podcasts and documentaries) with full CRUD operations, filtering capabilities, user management, and both synchronous and asynchronous external content import functionality.
 
 ## Collection Structure
 
@@ -47,15 +47,28 @@ The CMS Service manages shows (podcasts and documentaries) with full CRUD operat
 - **Get Distinct Fields**: Retrieve unique values for filtering
 - **Get Show Statistics**: Get aggregated statistics
 
-### 7. Import Operations
-- **Import from YouTube**: Bulk import from YouTube API with specified topic
-- **Import from Vimeo**: Bulk import from Vimeo API with specified topic
-- **Import from Mock Provider**: Test import functionality with specified topic
+### 7. Import Operations (Synchronous)
+- **Import from YouTube**: Bulk import from YouTube API with specified topic (blocking)
+- **Import from Vimeo**: Bulk import from Vimeo API with specified topic (blocking)
+- **Import from Mock Provider**: Test import functionality with specified topic (blocking)
 - **Get Import Job Status**: Monitor import progress
 - **Cancel Import Job**: Stop running imports
 - **Get All Import Jobs**: List import history
 - **Get Available Providers**: List supported providers
 - **Check Provider Health**: Verify provider connectivity
+
+### 8. **🚀 Async Import Operations (NEW)**
+- **Start Async Import - YouTube**: Non-blocking YouTube import with RabbitMQ job queue
+- **Start Async Import - Vimeo**: Non-blocking Vimeo import with RabbitMQ job queue
+- **Start Async Import - Mock Provider**: Non-blocking mock import for testing
+- **Get Import Job Status**: Real-time job status and progress tracking
+- **Cancel Import Job**: Cancel queued or running async jobs
+- **Retry Failed Import Job**: Retry failed jobs with exponential backoff
+- **Get My Import Jobs**: View current user's import jobs
+- **Get All Import Jobs (Admin)**: Admin view of all import jobs with filtering
+- **Get Import Jobs by Status**: Filter jobs by status (QUEUED, PROCESSING, COMPLETED, etc.)
+- **Get Import Statistics**: Comprehensive import metrics and analytics
+- **Get Available Providers (Async)**: Provider info with rate limits and batch sizes
 
 **Import Request Format:**
 ```json
@@ -63,10 +76,40 @@ The CMS Service manages shows (podcasts and documentaries) with full CRUD operat
   "topic": "education",
   "startDate": "2024-01-01",
   "endDate": "2024-01-31",
-  "skipDuplicates": true,
-  "batchSize": 10
+  "skipDuplicates": true
 }
 ```
+
+## 🚀 Async Import Operations Features
+
+### Key Benefits
+- **Non-blocking**: Returns `202 Accepted` immediately with job ID
+- **Background Processing**: Jobs processed by RabbitMQ workers
+- **Real-time Progress**: Track job status and progress in real-time
+- **Fault Tolerance**: Automatic retry with exponential backoff
+- **Horizontal Scaling**: Add more worker instances for better performance
+- **Job Management**: Cancel, retry, and monitor jobs
+
+### Job Status Values
+- `QUEUED`: Job queued for processing
+- `PROCESSING`: Job is being processed
+- `FETCHING`: Fetching data from external provider
+- `SAVING`: Saving data to database
+- `COMPLETED`: Job completed successfully
+- `FAILED`: Job failed
+- `CANCELLED`: Job was cancelled
+- `RETRYING`: Job is being retried after failure
+
+### Async vs Synchronous Import
+
+| Feature | Synchronous | Async |
+|---------|-------------|-------|
+| Response Time | 30+ seconds | < 1 second |
+| User Experience | Blocking | Non-blocking |
+| Progress Tracking | None | Real-time |
+| Fault Tolerance | None | Automatic retry |
+| Scalability | Limited | Horizontal |
+| Monitoring | Basic | Comprehensive |
 
 **Required Fields:**
 - `topic`: Search topic for content import (e.g., "education", "technology", "science")
@@ -99,6 +142,8 @@ The collection uses the following variables:
 - `editorAccessToken`: Editor JWT token (auto-populated)
 - `editorRefreshToken`: Editor refresh token (auto-populated)
 - `importTopic`: Default topic for import operations (default: "education")
+- **`asyncJobId`**: Job ID from async import operations (auto-captured)
+- **`jobStatus`**: Job status filter for queries (default: "PROCESSING")
 
 ## Getting Started
 
@@ -129,9 +174,37 @@ The collection includes requests that demonstrate error scenarios:
 - Not found errors (404)
 - Insufficient permissions (403)
 
+## 🧪 Async Import Testing Workflow
+
+### Quick Start with Async Imports
+1. **Login**: Use "Login - Admin" to authenticate
+2. **Start Async Import**: Run "Start Async Import - YouTube"
+   - Returns `202 Accepted` immediately
+   - Job ID automatically saved to `asyncJobId` variable
+3. **Monitor Progress**: Run "Get Import Job Status" repeatedly
+   - Uses the captured job ID
+   - Watch status change: QUEUED → PROCESSING → FETCHING → SAVING → COMPLETED
+4. **View Results**: Check "Get My Import Jobs" to see job history
+
+### Advanced Testing
+- **Cancel Jobs**: Test job cancellation with "Cancel Import Job"
+- **Retry Failed Jobs**: Use "Retry Failed Import Job" for failed imports
+- **Monitor System**: Use "Get Import Statistics" for system health
+- **Filter Jobs**: Use "Get Import Jobs by Status" with different status values
+
+### Test Scripts Features
+The collection includes automated test scripts that:
+- ✅ Validate HTTP status codes (202 for async start, 200 for status)
+- ✅ Check response structure and required fields
+- ✅ Auto-capture job IDs for subsequent requests
+- ✅ Log progress information to Postman console
+- ✅ Verify job status transitions and completion
+
 ## Notes
 
 - All endpoints support pagination where applicable
 - Filtering endpoints provide comprehensive search capabilities
-- Import operations are asynchronous with job tracking
+- **NEW**: Async import operations provide non-blocking background processing
+- Import operations support both synchronous and asynchronous modes
 - The service includes comprehensive validation and error handling
+- RabbitMQ is required for async import functionality

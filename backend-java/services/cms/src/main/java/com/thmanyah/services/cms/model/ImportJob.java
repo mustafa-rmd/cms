@@ -17,6 +17,7 @@ public class ImportJob {
   private ImportJobStatus status;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
+  private LocalDateTime completedAt;
   private String createdBy;
   private Integer totalItems;
   private Integer processedItems;
@@ -24,13 +25,28 @@ public class ImportJob {
   private Integer failedItems;
   private String errorMessage;
   private String errorDetails;
+  private String statusMessage;
 
   public enum ImportJobStatus {
     PENDING,
+    QUEUED,
     IN_PROGRESS,
+    PROCESSING,
+    FETCHING,
+    SAVING,
     COMPLETED,
     FAILED,
-    CANCELLED
+    CANCELLED,
+    RETRYING;
+
+    public boolean isActive() {
+      return this == QUEUED || this == IN_PROGRESS || this == PROCESSING ||
+             this == FETCHING || this == SAVING || this == RETRYING;
+    }
+
+    public boolean isTerminal() {
+      return this == COMPLETED || this == FAILED || this == CANCELLED;
+    }
   }
 
   public static ImportJob create(
@@ -89,5 +105,32 @@ public class ImportJob {
     return status == ImportJobStatus.COMPLETED
         || status == ImportJobStatus.FAILED
         || status == ImportJobStatus.CANCELLED;
+  }
+
+  // Additional methods for async processing
+  public UUID getId() {
+    return this.jobId;
+  }
+
+  public void setId(UUID id) {
+    this.jobId = id;
+  }
+
+  public void setStatusMessage(String statusMessage) {
+    this.statusMessage = statusMessage;
+    this.updatedAt = LocalDateTime.now();
+  }
+
+  public void setCompletedAt(LocalDateTime completedAt) {
+    this.completedAt = completedAt;
+  }
+
+  public void setStatus(ImportJobStatus status) {
+    this.status = status;
+    this.updatedAt = LocalDateTime.now();
+  }
+
+  public void setUpdatedAt(LocalDateTime updatedAt) {
+    this.updatedAt = updatedAt;
   }
 }

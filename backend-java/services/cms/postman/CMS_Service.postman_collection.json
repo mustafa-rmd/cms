@@ -65,6 +65,18 @@
 			"key": "importTopic",
 			"value": "education",
 			"type": "string"
+		},
+		{
+			"key": "asyncJobId",
+			"value": "",
+			"type": "string",
+			"description": "Job ID returned from async import operations"
+		},
+		{
+			"key": "jobStatus",
+			"value": "PROCESSING",
+			"type": "string",
+			"description": "Job status for filtering: QUEUED, PROCESSING, FETCHING, SAVING, COMPLETED, FAILED, CANCELLED, RETRYING"
 		}
 	],
 	"item": [
@@ -1169,6 +1181,307 @@
 							"path": ["api", "v1", "import", "providers", "youtube", "health"]
 						}
 					}
+				}
+			]
+		},
+		{
+			"name": "Async Import Operations",
+			"description": "Background job processing for imports using RabbitMQ",
+			"item": [
+				{
+					"name": "Start Async Import - YouTube",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test for successful async import start",
+									"pm.test(\"Status code is 202 Accepted\", function () {",
+									"    pm.response.to.have.status(202);",
+									"});",
+									"",
+									"// Extract job ID from response",
+									"if (pm.response.code === 202) {",
+									"    const responseJson = pm.response.json();",
+									"    if (responseJson.id) {",
+									"        pm.collectionVariables.set(\"asyncJobId\", responseJson.id);",
+									"        console.log(\"Async job ID saved: \" + responseJson.id);",
+									"    }",
+									"}",
+									"",
+									"// Test response structure",
+									"pm.test(\"Response has job details\", function () {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson).to.have.property('id');",
+									"    pm.expect(responseJson).to.have.property('status');",
+									"    pm.expect(responseJson).to.have.property('provider');",
+									"    pm.expect(responseJson.status).to.eql('QUEUED');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminAccessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"topic\": \"{{importTopic}}\",\n  \"startDate\": \"2024-01-01\",\n  \"endDate\": \"2024-01-31\",\n  \"skipDuplicates\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/import/async/youtube",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "import", "async", "youtube"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Start Async Import - Vimeo",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminAccessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"topic\": \"{{importTopic}}\",\n  \"startDate\": \"2024-01-01\",\n  \"endDate\": \"2024-01-31\",\n  \"skipDuplicates\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/import/async/vimeo",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "import", "async", "vimeo"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Start Async Import - Mock Provider",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminAccessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"topic\": \"{{importTopic}}\",\n  \"startDate\": \"2024-01-01\",\n  \"endDate\": \"2024-01-31\",\n  \"skipDuplicates\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/import/async/mock",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "import", "async", "mock"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Import Job Status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test for successful job status retrieval",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Test response structure",
+									"pm.test(\"Response has job status details\", function () {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson).to.have.property('id');",
+									"    pm.expect(responseJson).to.have.property('status');",
+									"    pm.expect(responseJson).to.have.property('provider');",
+									"    pm.expect(responseJson).to.have.property('createdAt');",
+									"    pm.expect(responseJson).to.have.property('updatedAt');",
+									"});",
+									"",
+									"// Log job status for monitoring",
+									"const responseJson = pm.response.json();",
+									"console.log(`Job ${responseJson.id} status: ${responseJson.status}`);",
+									"if (responseJson.statusMessage) {",
+									"    console.log(`Status message: ${responseJson.statusMessage}`);",
+									"}",
+									"if (responseJson.totalItems) {",
+									"    console.log(`Progress: ${responseJson.processedItems}/${responseJson.totalItems} items`);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminAccessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/import/async/jobs/{{asyncJobId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "import", "async", "jobs", "{{asyncJobId}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Import Job",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminAccessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/import/async/jobs/{{jobId}}/cancel",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "import", "async", "jobs", "{{jobId}}", "cancel"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retry Failed Import Job",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminAccessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/import/async/jobs/{{jobId}}/retry",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "import", "async", "jobs", "{{jobId}}", "retry"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Import Jobs",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminAccessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/import/async/jobs/my",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "import", "async", "jobs", "my"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Import Jobs (Admin)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminAccessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/import/async/jobs",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "import", "async", "jobs"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Import Jobs by Status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminAccessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/import/async/jobs?status={{jobStatus}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "import", "async", "jobs"],
+							"query": [
+								{
+									"key": "status",
+									"value": "{{jobStatus}}",
+									"description": "Filter by job status: QUEUED, PROCESSING, FETCHING, SAVING, COMPLETED, FAILED, CANCELLED, RETRYING"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Import Statistics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminAccessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/import/async/stats",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "import", "async", "stats"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Available Providers (Async)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminAccessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/import/async/providers",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "import", "async", "providers"]
+						}
+					},
+					"response": []
 				}
 			]
 		},

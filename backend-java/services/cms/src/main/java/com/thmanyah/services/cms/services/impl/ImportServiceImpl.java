@@ -17,9 +17,11 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 @Service
+@Primary
 @Slf4j
 @RequiredArgsConstructor
 public class ImportServiceImpl implements ImportService {

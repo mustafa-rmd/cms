@@ -133,6 +133,19 @@ cms:
         show-created: ${CMS_SHOW_CREATED_ROUTING_KEY:show.created}
         show-updated: ${CMS_SHOW_UPDATED_ROUTING_KEY:show.updated}
         show-deleted: ${CMS_SHOW_DELETED_ROUTING_KEY:show.deleted}
+
+  # Import Job Processing Configuration
+  import:
+    rabbitmq:
+      exchange: ${CMS_IMPORT_EXCHANGE:cms.import.exchange}
+      queue: ${CMS_IMPORT_QUEUE:cms.import.queue}
+      routing-key: ${CMS_IMPORT_ROUTING_KEY:import.job}
+      dlq: ${CMS_IMPORT_DLQ:cms.import.dlq}
+      retry-queue: ${CMS_IMPORT_RETRY_QUEUE:cms.import.retry}
+    processing:
+      max-concurrent-jobs: ${CMS_IMPORT_MAX_CONCURRENT:5}
+      job-timeout-minutes: ${CMS_IMPORT_TIMEOUT:30}
+      max-retries: ${CMS_IMPORT_MAX_RETRIES:3}
   jwt:
     secret: ${JWT_SECRET:mySecretKey1234567890123456789012345678901234567890} # Must be at least 256 bits (32 chars)
     expiration: ${JWT_EXPIRATION:86400000} # 24 hours in milliseconds
