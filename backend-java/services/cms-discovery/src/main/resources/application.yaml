@@ -77,6 +77,14 @@ cms-discovery:
     highlight-enabled: ${SEARCH_HIGHLIGHT_ENABLED:true}
     fuzzy-enabled: ${SEARCH_FUZZY_ENABLED:true}
 
+  # CORS Configuration
+  cors:
+    allowed-origins: ${CMS_DISCOVERY_CORS_ALLOWED_ORIGINS:http://localhost:4200,http://localhost:3000,http://127.0.0.1:4200,http://127.0.0.1:3000}
+    allowed-methods: ${CMS_DISCOVERY_CORS_ALLOWED_METHODS:GET,POST,PUT,DELETE,PATCH,OPTIONS}
+    allowed-headers: ${CMS_DISCOVERY_CORS_ALLOWED_HEADERS:*}
+    allow-credentials: ${CMS_DISCOVERY_CORS_ALLOW_CREDENTIALS:true}
+    max-age: ${CMS_DISCOVERY_CORS_MAX_AGE:3600}
+
 # API Documentation
 springdoc:
   api-docs:
@@ -91,3 +99,5 @@ springdoc:
     contact:
       name: thmanyah Platform Team
       email: platform@thmanyah.io
+
+
