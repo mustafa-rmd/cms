@@ -1,0 +1,102 @@
+# Test configuration for CMS Discovery service
+spring:
+  
+  # Elasticsearch configuration (will be overridden by TestContainers)
+  elasticsearch:
+    uris: http://localhost:9200
+    username: ""
+    password: ""
+    connection-timeout: 10s
+    socket-timeout: 30s
+  
+  # RabbitMQ configuration (will be overridden by TestContainers)
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    virtual-host: /
+
+# Logging configuration for tests
+logging:
+  level:
+    com.thmanyah.services.cmsdiscovery: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.amqp: DEBUG
+    org.springframework.data.elasticsearch: DEBUG
+    org.testcontainers: INFO
+    org.elasticsearch: INFO
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+# CMS Discovery specific test configuration
+cms-discovery:
+  # Elasticsearch configuration for tests
+  elasticsearch:
+    index-name: test-cms-shows
+    refresh-policy: immediate
+    batch-size: 10
+    timeout: 10s
+  
+  # RabbitMQ event configuration for tests
+  rabbitmq:
+    exchange: test.cms.events
+    queue: test.cms-discovery.shows
+    routing-key: test.show.created
+    dead-letter-queue: test.cms-discovery.shows.dlq
+  
+  # Search configuration for tests
+  search:
+    default-page-size: 10
+    max-page-size: 50
+    highlight-enabled: true
+    fuzzy-enabled: true
+    max-query-length: 1000
+    timeout: 5s
+  
+  # CORS configuration for tests
+  cors:
+    allowed-origins: http://localhost:3000,http://localhost:4200
+    allowed-methods: GET,POST,OPTIONS
+    allowed-headers: "*"
+    allow-credentials: false
+    max-age: 3600
+
+# Management endpoints for tests
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,elasticsearch
+  endpoint:
+    health:
+      show-details: always
+    elasticsearch:
+      enabled: true
+
+# Test-specific properties
+test:
+  containers:
+    elasticsearch:
+      image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+      memory: 512m
+      discovery-type: single-node
+      security-enabled: false
+    rabbitmq:
+      image: rabbitmq:3.13-management
+      username: test_user
+      password: test_password
+  
+  data:
+    cleanup: true
+    seed: false
+  
+  timeouts:
+    elasticsearch-indexing: 1000
+    message-processing: 2000
+    http-request: 5000
+  
+  search:
+    test-index-prefix: test-
+    force-refresh: true
+    wait-for-completion: true
