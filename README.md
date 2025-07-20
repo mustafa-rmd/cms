@@ -120,7 +120,7 @@ A comprehensive platform for content management and discovery, featuring a moder
 - **Docker**: Containerization
 
 ### **Infrastructure**
-- **Docker Compose**: Local development environment
+- **Docker & Docker Compose**: Containerization and orchestration
 - **Maven**: Build and dependency management
 - **Swagger**: API documentation
 - **JUnit**: Unit testing
@@ -142,14 +142,75 @@ A comprehensive platform for content management and discovery, featuring a moder
 
 ## 🚀 **Quick Start**
 
-### **Prerequisites**
+### **Option 1: Docker Compose (Recommended)**
+
+The easiest way to run the complete application is using Docker Compose, which sets up all services automatically.
+
+#### **Prerequisites**
+- **Docker & Docker Compose** installed
+- **At least 4GB of available RAM**
+
+#### **Quick Start with Docker**
+
+```bash
+# Clone and navigate to the project root
+cd /path/to/cms
+
+# Build and start all services
+docker-compose up --build
+
+# Access the applications:
+# Frontend: http://localhost:4200
+# CMS API: http://localhost:8078
+# Discovery API: http://localhost:8079
+# Swagger UI (CMS): http://localhost:8078/swagger-ui.html
+# Swagger UI (Discovery): http://localhost:8079/swagger-ui.html
+# RabbitMQ Management: http://localhost:15672 (guest/guest)
+# Kibana: http://localhost:5601
+# Elasticsearch: http://localhost:9200
+```
+
+#### **Docker Services Overview**
+
+| Service | Port | Description |
+|---------|------|-------------|
+| **Frontend** | 4200 | Angular application served by Nginx |
+| **CMS Service** | 8078 | Main API for content management |
+| **Discovery Service** | 8079 | Search and discovery API |
+| **PostgreSQL** | 5432 | Primary database |
+| **RabbitMQ** | 5672, 15672 | Message broker with management UI |
+| **Elasticsearch** | 9200, 9300 | Search engine |
+| **Kibana** | 5601 | Elasticsearch management UI |
+
+#### **Docker Commands**
+
+```bash
+# Start all services
+docker-compose up --build
+
+# Start in background
+docker-compose up -d --build
+
+# View logs
+docker-compose logs -f
+
+# Stop all services
+docker-compose down
+
+# Stop and remove volumes
+docker-compose down -v
+```
+
+### **Option 2: Manual Setup**
+
+#### **Prerequisites**
 - **Node.js 18+** (for frontend)
 - **Java 17** (for backend)
 - **Docker & Docker Compose** (for infrastructure)
 - **Maven 3.8+** (for backend)
 - **Angular CLI 17** (for frontend)
 
-### **1. Backend Setup**
+#### **1. Backend Setup**
 
 ```bash
 # Navigate to backend directory
@@ -167,7 +228,7 @@ cd services/cms-discovery
 mvn spring-boot:run
 ```
 
-### **2. Frontend Setup**
+#### **2. Frontend Setup**
 
 ```bash
 # Navigate to frontend directory
@@ -180,7 +241,7 @@ npm install --legacy-peer-deps
 npm start
 ```
 
-### **3. Access the Application**
+#### **3. Access the Application**
 
 - **Frontend**: http://localhost:4200
 - **CMS API**: http://localhost:8078/swagger-ui.html
