@@ -1,0 +1,479 @@
+<div class="container fade-in">
+  <!-- Access Denied Message -->
+  <div *ngIf="!isAdmin()" class="row">
+    <div class="col-12">
+      <div class="card text-center">
+        <div class="card-body">
+          <i class="bi bi-shield-lock display-1 text-danger mb-3"></i>
+          <h3>تم رفض الوصول</h3>
+          <p class="text-muted">تحتاج إلى صلاحيات المدير للوصول إلى إدارة المستخدمين.</p>
+          <a routerLink="/" class="btn btn-primary">
+            <i class="bi bi-house me-2"></i>العودة للرئيسية
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Content -->
+  <div *ngIf="isAdmin()">
+    <!-- Header -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+          <h2 class="mb-0 fade-in-up">
+            <i class="bi bi-people me-2 floating"></i>إدارة المستخدمين
+          </h2>
+          <button class="btn btn-primary fade-in-up" (click)="showCreateUserForm()">
+            <i class="bi bi-person-plus me-2"></i>إضافة مستخدم جديد
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- User Statistics -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="row">
+          <div class="col-lg-2 col-md-4 col-6 mb-3">
+            <div class="card text-center stat-card fade-in-up" style="animation-delay: 0.1s;">
+              <div class="card-body">
+                <i class="bi bi-people-fill display-6 text-primary mb-2"></i>
+                <h4 class="mb-1">{{ userStats.total }}</h4>
+                <small class="text-muted">إجمالي المستخدمين</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-2 col-md-4 col-6 mb-3">
+            <div class="card text-center stat-card fade-in-up" style="animation-delay: 0.2s;">
+              <div class="card-body">
+                <i class="bi bi-shield-check display-6 text-danger mb-2"></i>
+                <h4 class="mb-1">{{ userStats.admins }}</h4>
+                <small class="text-muted">المديرين</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-2 col-md-4 col-6 mb-3">
+            <div class="card text-center stat-card fade-in-up" style="animation-delay: 0.3s;">
+              <div class="card-body">
+                <i class="bi bi-pencil-square display-6 text-info mb-2"></i>
+                <h4 class="mb-1">{{ userStats.editors }}</h4>
+                <small class="text-muted">المحررين</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-2 col-md-4 col-6 mb-3">
+            <div class="card text-center stat-card fade-in-up" style="animation-delay: 0.4s;">
+              <div class="card-body">
+                <i class="bi bi-check-circle display-6 text-success mb-2"></i>
+                <h4 class="mb-1">{{ userStats.active }}</h4>
+                <small class="text-muted">النشطين</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-2 col-md-4 col-6 mb-3">
+            <div class="card text-center stat-card fade-in-up" style="animation-delay: 0.5s;">
+              <div class="card-body">
+                <i class="bi bi-x-circle display-6 text-secondary mb-2"></i>
+                <h4 class="mb-1">{{ userStats.inactive }}</h4>
+                <small class="text-muted">غير النشطين</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-2 col-md-4 col-6 mb-3">
+            <div class="card text-center stat-card fade-in-up" style="animation-delay: 0.6s;">
+              <div class="card-body">
+                <i class="bi bi-arrow-clockwise display-6 text-warning mb-2"></i>
+                <h4 class="mb-1">30s</h4>
+                <small class="text-muted">تحديث تلقائي</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card fade-in-up" style="animation-delay: 0.1s;">
+          <div class="card-body">
+            <div class="row">
+              <!-- Search -->
+              <div class="col-md-6 mb-3">
+                <form [formGroup]="searchForm">
+                  <div class="input-group">
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="searchQuery"
+                      placeholder="البحث بالبريد الإلكتروني..."
+                      dir="rtl"
+                    >
+                    <button class="btn btn-outline-primary" type="button">
+                      <i class="bi bi-search"></i>
+                    </button>
+                    <button 
+                      *ngIf="searchQuery" 
+                      class="btn btn-outline-secondary" 
+                      type="button"
+                      (click)="clearSearch()"
+                    >
+                      <i class="bi bi-x"></i>
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              <!-- Filters -->
+              <div class="col-md-6">
+                <div class="btn-group w-100" role="group">
+                  <button 
+                    type="button" 
+                    class="btn"
+                    [class.btn-primary]="currentFilter === 'all'"
+                    [class.btn-outline-primary]="currentFilter !== 'all'"
+                    (click)="onFilterChange('all')"
+                  >
+                    <i class="bi bi-people me-1"></i>الكل
+                  </button>
+                  <button 
+                    type="button" 
+                    class="btn"
+                    [class.btn-primary]="currentFilter === 'admin'"
+                    [class.btn-outline-primary]="currentFilter !== 'admin'"
+                    (click)="onFilterChange('admin')"
+                  >
+                    <i class="bi bi-shield-check me-1"></i>المديرين
+                  </button>
+                  <button 
+                    type="button" 
+                    class="btn"
+                    [class.btn-primary]="currentFilter === 'editor'"
+                    [class.btn-outline-primary]="currentFilter !== 'editor'"
+                    (click)="onFilterChange('editor')"
+                  >
+                    <i class="bi bi-pencil me-1"></i>المحررين
+                  </button>
+                  <button 
+                    type="button" 
+                    class="btn"
+                    [class.btn-primary]="currentFilter === 'active'"
+                    [class.btn-outline-primary]="currentFilter !== 'active'"
+                    (click)="onFilterChange('active')"
+                  >
+                    <i class="bi bi-check-circle me-1"></i>النشطين
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div class="row mb-3" *ngIf="errorMessage || successMessage">
+      <div class="col-12">
+        <div class="alert alert-danger slide-in-up" *ngIf="errorMessage">
+          <i class="bi bi-exclamation-triangle me-2"></i>{{ errorMessage }}
+          <button type="button" class="btn-close float-start" (click)="clearMessages()"></button>
+        </div>
+        <div class="alert alert-success slide-in-up" *ngIf="successMessage">
+          <i class="bi bi-check-circle me-2"></i>{{ successMessage }}
+          <button type="button" class="btn-close float-start" (click)="clearMessages()"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div class="row" *ngIf="loading">
+      <div class="col-12 text-center">
+        <div class="spinner-border" role="status" style="width: 3rem; height: 3rem;">
+          <span class="visually-hidden">جاري التحميل...</span>
+        </div>
+        <p class="mt-3 text-muted">جاري تحميل المستخدمين...</p>
+      </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="row" *ngIf="!loading && filteredUsers.length > 0">
+      <div class="col-12">
+        <div class="card fade-in-up" style="animation-delay: 0.2s;">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+              <i class="bi bi-table me-2"></i>قائمة المستخدمين ({{ totalElements }})
+            </h5>
+            <div class="text-muted">
+              <small>الصفحة {{ currentPage + 1 }} من {{ totalPages }}</small>
+            </div>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th>البريد الإلكتروني</th>
+                    <th>الدور</th>
+                    <th>الحالة</th>
+                    <th>تاريخ الإنشاء</th>
+                    <th>آخر تحديث</th>
+                    <th>أنشأ بواسطة</th>
+                    <th>الإجراءات</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let user of filteredUsers; let i = index" class="stagger-item">
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <i class="bi bi-person-circle me-2 text-primary"></i>
+                        {{ user.email }}
+                      </div>
+                    </td>
+                    <td>
+                      <span 
+                        class="badge"
+                        [class]="getRoleBadgeClass(user.role)"
+                      >
+                        {{ getRoleDisplayName(user.role) }}
+                      </span>
+                    </td>
+                    <td>
+                      <span 
+                        class="badge"
+                        [class]="getStatusBadgeClass(user.isActive)"
+                      >
+                        {{ getStatusDisplayName(user.isActive) }}
+                      </span>
+                    </td>
+                    <td>
+                      <small class="text-muted">{{ formatDate(user.createdDate) }}</small>
+                    </td>
+                    <td>
+                      <small class="text-muted">{{ formatDate(user.updatedDate) }}</small>
+                    </td>
+                    <td>
+                      <small class="text-muted">{{ user.createdBy }}</small>
+                    </td>
+                    <td>
+                      <div class="btn-group btn-group-sm">
+                        <button 
+                          class="btn btn-outline-primary"
+                          (click)="showEditUserForm(user)"
+                          title="تعديل المستخدم"
+                          [disabled]="!canEditUser(user)"
+                        >
+                          <i class="bi bi-pencil"></i>
+                        </button>
+                        <button 
+                          class="btn btn-outline-danger"
+                          (click)="deleteUser(user)"
+                          title="إلغاء تفعيل المستخدم"
+                          [disabled]="!canDeleteUser(user)"
+                        >
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- No Search Results Message -->
+    <div class="row" *ngIf="!loading && filteredUsers.length === 0 && users.length > 0">
+      <div class="col-12">
+        <div class="card text-center">
+          <div class="card-body">
+            <i class="bi bi-search display-1 text-muted mb-3 floating"></i>
+            <h4>لا توجد نتائج</h4>
+            <p class="text-muted">لم يتم العثور على مستخدمين مطابقين لمعايير البحث.</p>
+            <button class="btn btn-outline-primary" (click)="clearSearch()">
+              <i class="bi bi-arrow-clockwise me-2"></i>مسح البحث
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- No Users Message -->
+    <div class="row" *ngIf="!loading && users.length === 0">
+      <div class="col-12">
+        <div class="card text-center">
+          <div class="card-body">
+            <i class="bi bi-people display-1 text-muted mb-3 floating"></i>
+            <h4>لا يوجد مستخدمين</h4>
+            <p class="text-muted">لم يتم العثور على مستخدمين في النظام.</p>
+            <button class="btn btn-primary" (click)="loadUsers()">
+              <i class="bi bi-arrow-clockwise me-2"></i>إعادة تحميل
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="row mt-4" *ngIf="totalPages > 1">
+      <div class="col-12">
+        <nav class="fade-in-up" style="animation-delay: 0.3s;">
+          <ul class="pagination justify-content-center">
+            <li class="page-item" [class.disabled]="currentPage === 0">
+              <a class="page-link" href="#" (click)="onPageChange(currentPage - 1); $event.preventDefault()">
+                <i class="bi bi-chevron-left"></i>السابق
+              </a>
+            </li>
+            <li class="page-item" *ngFor="let page of getPageNumbers()" [class.active]="page === currentPage">
+              <a class="page-link" href="#" (click)="onPageChange(page); $event.preventDefault()">{{ page + 1 }}</a>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage === totalPages - 1">
+              <a class="page-link" href="#" (click)="onPageChange(currentPage + 1); $event.preventDefault()">
+                التالي<i class="bi bi-chevron-right"></i>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Create User Modal -->
+    <div class="modal fade show d-block" *ngIf="showCreateForm" style="background-color: rgba(0,0,0,0.5);">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bounce-in">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <i class="bi bi-person-plus me-2"></i>إضافة مستخدم جديد
+            </h5>
+            <button type="button" class="btn-close" (click)="hideForms()"></button>
+          </div>
+          <form [formGroup]="createForm" (ngSubmit)="createUser()">
+            <div class="modal-body">
+              <div class="mb-3">
+                <label for="createEmail" class="form-label">
+                  <i class="bi bi-envelope me-1"></i>البريد الإلكتروني
+                </label>
+                <input
+                  type="email"
+                  class="form-control"
+                  id="createEmail"
+                  formControlName="email"
+                  dir="rtl"
+                  [class.is-invalid]="createForm.get('email')?.invalid && createForm.get('email')?.touched"
+                >
+                <div class="invalid-feedback" *ngIf="createForm.get('email')?.invalid && createForm.get('email')?.touched">
+                  <div *ngIf="createForm.get('email')?.errors?.['required']">البريد الإلكتروني مطلوب</div>
+                  <div *ngIf="createForm.get('email')?.errors?.['email']">يرجى إدخال بريد إلكتروني صحيح</div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="createPassword" class="form-label">
+                  <i class="bi bi-lock me-1"></i>كلمة المرور
+                </label>
+                <input
+                  type="password"
+                  class="form-control"
+                  id="createPassword"
+                  formControlName="password"
+                  dir="rtl"
+                  [class.is-invalid]="createForm.get('password')?.invalid && createForm.get('password')?.touched"
+                >
+                <div class="invalid-feedback" *ngIf="createForm.get('password')?.invalid && createForm.get('password')?.touched">
+                  <div *ngIf="createForm.get('password')?.errors?.['required']">كلمة المرور مطلوبة</div>
+                  <div *ngIf="createForm.get('password')?.errors?.['minlength']">كلمة المرور يجب أن تكون 6 أحرف على الأقل</div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="createRole" class="form-label">
+                  <i class="bi bi-shield me-1"></i>الدور
+                </label>
+                <select class="form-select" id="createRole" formControlName="role">
+                  <option value="EDITOR">محرر</option>
+                  <option value="ADMIN">مدير</option>
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" (click)="hideForms()">
+                <i class="bi bi-x me-1"></i>إلغاء
+              </button>
+              <button type="submit" class="btn btn-primary" [disabled]="createForm.invalid || loading">
+                <span class="spinner-border spinner-border-sm me-2" *ngIf="loading"></span>
+                <i class="bi bi-check me-1" *ngIf="!loading"></i>
+                {{ loading ? 'جاري الإنشاء...' : 'إنشاء المستخدم' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div class="modal fade show d-block" *ngIf="showEditForm" style="background-color: rgba(0,0,0,0.5);">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bounce-in">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <i class="bi bi-pencil me-2"></i>تعديل المستخدم
+            </h5>
+            <button type="button" class="btn-close" (click)="hideForms()"></button>
+          </div>
+          <form [formGroup]="editForm" (ngSubmit)="updateUser()">
+            <div class="modal-body">
+              <div class="mb-3">
+                <label for="editEmail" class="form-label">
+                  <i class="bi bi-envelope me-1"></i>البريد الإلكتروني
+                </label>
+                <input
+                  type="email"
+                  class="form-control"
+                  id="editEmail"
+                  formControlName="email"
+                  dir="rtl"
+                  [class.is-invalid]="editForm.get('email')?.invalid && editForm.get('email')?.touched"
+                >
+                <div class="invalid-feedback" *ngIf="editForm.get('email')?.invalid && editForm.get('email')?.touched">
+                  <div *ngIf="editForm.get('email')?.errors?.['required']">البريد الإلكتروني مطلوب</div>
+                  <div *ngIf="editForm.get('email')?.errors?.['email']">يرجى إدخال بريد إلكتروني صحيح</div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="editRole" class="form-label">
+                  <i class="bi bi-shield me-1"></i>الدور
+                </label>
+                <select class="form-select" id="editRole" formControlName="role">
+                  <option value="EDITOR">محرر</option>
+                  <option value="ADMIN">مدير</option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="editIsActive" formControlName="isActive">
+                  <label class="form-check-label" for="editIsActive">
+                    <i class="bi bi-check-circle me-1"></i>مستخدم نشط
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" (click)="hideForms()">
+                <i class="bi bi-x me-1"></i>إلغاء
+              </button>
+              <button type="submit" class="btn btn-primary" [disabled]="editForm.invalid || loading">
+                <span class="spinner-border spinner-border-sm me-2" *ngIf="loading"></span>
+                <i class="bi bi-check me-1" *ngIf="!loading"></i>
+                {{ loading ? 'جاري التحديث...' : 'تحديث المستخدم' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

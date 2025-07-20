@@ -21,6 +21,7 @@
                 formControlName="email"
                 [class.is-invalid]="email?.invalid && email?.touched"
                 placeholder="أدخل بريدك الإلكتروني"
+                dir="rtl"
               >
               <div class="invalid-feedback" *ngIf="email?.invalid && email?.touched">
                 <div *ngIf="email?.errors?.['required']">البريد الإلكتروني مطلوب</div>
@@ -40,6 +41,7 @@
                 formControlName="password"
                 [class.is-invalid]="password?.invalid && password?.touched"
                 placeholder="أدخل كلمة المرور"
+                dir="rtl"
               >
               <div class="invalid-feedback" *ngIf="password?.invalid && password?.touched">
                 <div *ngIf="password?.errors?.['required']">كلمة المرور مطلوبة</div>

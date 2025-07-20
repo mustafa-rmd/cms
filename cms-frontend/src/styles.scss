@@ -27,6 +27,110 @@ body {
   line-height: 1.6;
   margin: 0;
   padding: 0;
+  direction: rtl;
+  text-align: right;
+}
+
+/* RTL Support */
+[dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+}
+
+[dir="ltr"] {
+  direction: ltr;
+  text-align: left;
+}
+
+/* RTL Specific Styles */
+body {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Form Controls RTL */
+.form-control[dir="rtl"],
+input[dir="rtl"],
+textarea[dir="rtl"] {
+  text-align: right;
+  direction: rtl;
+}
+
+/* Table RTL */
+.table th,
+.table td {
+  text-align: right;
+}
+
+/* Button Groups RTL */
+.btn-group .btn:not(:last-child) {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+.btn-group .btn:not(:first-child) {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+/* Input Groups RTL */
+.input-group .form-control:not(:last-child) {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+.input-group .form-control:not(:first-child) {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+/* Dropdown RTL */
+.dropdown-menu {
+  text-align: right;
+}
+
+.dropdown-item {
+  text-align: right;
+}
+
+/* Pagination RTL */
+.pagination .page-link {
+  text-align: center;
+}
+
+/* Modal RTL */
+.modal-header .btn-close {
+  margin: -0.5rem auto -0.5rem -0.5rem;
+}
+
+/* Alert RTL */
+.alert {
+  text-align: right;
+}
+
+/* Card RTL */
+.card-header,
+.card-body,
+.card-footer {
+  text-align: right;
+}
+
+/* Navigation RTL */
+.navbar-nav .nav-link {
+  text-align: right;
+}
+
+/* Badge RTL */
+.badge {
+  text-align: center;
 }
 
 /* Typography */
