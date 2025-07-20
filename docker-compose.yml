@@ -1,0 +1,298 @@
+services:
+  # Frontend Application
+  cms-frontend:
+    build:
+      context: ./cms-frontend
+      dockerfile: Dockerfile
+    container_name: cms-frontend
+    ports:
+      - "4200:80"
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - cms-service
+      - cms-discovery-service
+    networks:
+      - cms-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # CMS Backend Service
+  cms-service:
+    build:
+      context: ./backend-java
+      dockerfile: services/cms/Dockerfile
+      args:
+        VERSION: ${VERSION:-0.0.1-SNAPSHOT}
+        BUILD_TIMESTAMP: ${BUILD_TIMESTAMP:-unknown}
+        GIT_HASH: ${GIT_HASH:-unknown}
+        GIT_BRANCH: ${GIT_BRANCH:-main}
+        GIT_COMMIT_TIMESTAMP: ${GIT_COMMIT_TIMESTAMP:-unknown}
+    container_name: cms-service
+    ports:
+      - "8078:8078"
+    environment:
+      # Server Configuration
+      - CMS_SERVICE_PORT=8078
+      - CMS_SERVICE_NAME=cms
+      
+      # Database Configuration
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DATABASE=cms_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - CMS_SCHEMA=public
+      - FLYWAY_MIGRATION_ENABLED=true
+      - JPA_SHOW_SQL=false
+      - JPA_DDL_AUTO=update
+      
+      # RabbitMQ Configuration
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USERNAME=guest
+      - RABBITMQ_PASSWORD=guest
+      - RABBITMQ_VIRTUAL_HOST=/
+      
+      # JWT Configuration
+      - JWT_SECRET=mySecretKey1234567890123456789012345678901234567890
+      - JWT_EXPIRATION=86400000
+      - JWT_REFRESH_EXPIRATION=604800000
+      
+      # Admin User Configuration
+      - CMS_ADMIN_EMAIL=admin@thmanyah.io
+      - CMS_ADMIN_PASSWORD=AdminPassword123!
+      - CMS_ADMIN_ENABLED=true
+      
+      # Event Publishing Configuration
+      - CMS_EVENTS_EXCHANGE=cms.events
+      - CMS_SHOW_CREATED_ROUTING_KEY=show.created
+      - CMS_SHOW_UPDATED_ROUTING_KEY=show.updated
+      - CMS_SHOW_DELETED_ROUTING_KEY=show.deleted
+      
+      # Import Job Configuration
+      - CMS_IMPORT_EXCHANGE=cms.import.exchange
+      - CMS_IMPORT_QUEUE=cms.import.queue
+      - CMS_IMPORT_ROUTING_KEY=import.job
+      - CMS_IMPORT_DLQ=cms.import.dlq
+      - CMS_IMPORT_RETRY_QUEUE=cms.import.retry
+      - CMS_IMPORT_MAX_CONCURRENT=5
+      - CMS_IMPORT_TIMEOUT=30
+      - CMS_IMPORT_MAX_RETRIES=3
+      
+      # CORS Configuration
+      - CMS_CORS_ALLOWED_ORIGINS=http://localhost:4200,http://cms-frontend:80,http://127.0.0.1:4200
+      - CMS_CORS_ALLOWED_METHODS=GET,POST,PUT,DELETE,PATCH,OPTIONS
+      - CMS_CORS_ALLOWED_HEADERS=*
+      - CMS_CORS_ALLOW_CREDENTIALS=true
+      - CMS_CORS_MAX_AGE=3600
+      
+      # External Provider Configuration
+      - YOUTUBE_API_KEY=AIzaSyCKsXxKvJHRWEne4z_ffFrKS1v-y6WqBrM
+      - VIMEO_CLIENT_ID=086c9832e5a68549a67112c312cf8a7d314666d5
+      - VIMEO_CLIENT_SECRET=89g3yXwK3m+oZ/zq9emYXDD83LkITCAOJC7fQUIIsw2WmQqYuIaNwmZsN+4BrE++zkhcxUgf+SwhmXzkU/ttNUcgCgw8CtGvXrtPKIpCTc9E+1qlzY4QcQ3Xp7Uawnvc
+      - MOCK_PROVIDER_ENABLED=true
+      
+      # Build Information
+      - VERSION=${VERSION:-0.0.1-SNAPSHOT}
+      - BUILD_TIMESTAMP=${BUILD_TIMESTAMP:-unknown}
+      - GIT_HASH=${GIT_HASH:-unknown}
+      - GIT_BRANCH=${GIT_BRANCH:-main}
+      - GIT_COMMIT_TIMESTAMP=${GIT_COMMIT_TIMESTAMP:-unknown}
+      
+      # Java Options
+      - JAVA_OPTS=-Xmx512m -Xms256m
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - cms-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8078/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # CMS Discovery Service
+  cms-discovery-service:
+    build:
+      context: ./backend-java
+      dockerfile: services/cms-discovery/Dockerfile
+      args:
+        VERSION: ${VERSION:-0.0.1-SNAPSHOT}
+        BUILD_TIMESTAMP: ${BUILD_TIMESTAMP:-unknown}
+        GIT_HASH: ${GIT_HASH:-unknown}
+        GIT_BRANCH: ${GIT_BRANCH:-main}
+        GIT_COMMIT_TIMESTAMP: ${GIT_COMMIT_TIMESTAMP:-unknown}
+    container_name: cms-discovery-service
+    ports:
+      - "8079:8079"
+    environment:
+      # Server Configuration
+      - SERVER_PORT=8079
+      
+      # Elasticsearch Configuration
+      - ELASTICSEARCH_URIS=http://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=
+      - ELASTICSEARCH_PASSWORD=
+      - ELASTICSEARCH_CONNECTION_TIMEOUT=10s
+      - ELASTICSEARCH_SOCKET_TIMEOUT=30s
+      - ELASTICSEARCH_INDEX_NAME=cms-shows
+      - ELASTICSEARCH_REFRESH_POLICY=wait_for
+      - ELASTICSEARCH_BATCH_SIZE=100
+      
+      # RabbitMQ Configuration
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USERNAME=guest
+      - RABBITMQ_PASSWORD=guest
+      - RABBITMQ_VIRTUAL_HOST=/
+      - RABBITMQ_EXCHANGE=cms.events
+      - RABBITMQ_QUEUE=cms-discovery.shows
+      - RABBITMQ_ROUTING_KEY=show.created
+      - RABBITMQ_DLQ=cms-discovery.shows.dlq
+      
+      # Search Configuration
+      - SEARCH_DEFAULT_PAGE_SIZE=20
+      - SEARCH_MAX_PAGE_SIZE=100
+      - SEARCH_HIGHLIGHT_ENABLED=true
+      - SEARCH_FUZZY_ENABLED=true
+      
+      # CORS Configuration
+      - CMS_DISCOVERY_CORS_ALLOWED_ORIGINS=http://localhost:4200,http://cms-frontend:80,http://127.0.0.1:4200
+      - CMS_DISCOVERY_CORS_ALLOWED_METHODS=GET,POST,PUT,DELETE,PATCH,OPTIONS
+      - CMS_DISCOVERY_CORS_ALLOWED_HEADERS=*
+      - CMS_DISCOVERY_CORS_ALLOW_CREDENTIALS=true
+      - CMS_DISCOVERY_CORS_MAX_AGE=3600
+      
+      # Logging Configuration
+      - LOG_LEVEL=INFO
+      - ELASTICSEARCH_LOG_LEVEL=WARN
+      - RABBITMQ_LOG_LEVEL=WARN
+      
+      # Build Information
+      - VERSION=${VERSION:-0.0.1-SNAPSHOT}
+      - BUILD_TIMESTAMP=${BUILD_TIMESTAMP:-unknown}
+      - GIT_HASH=${GIT_HASH:-unknown}
+      - GIT_BRANCH=${GIT_BRANCH:-main}
+      - GIT_COMMIT_TIMESTAMP=${GIT_COMMIT_TIMESTAMP:-unknown}
+      
+      # Java Options
+      - JAVA_OPTS=-Xmx512m -Xms256m
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - cms-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8079/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Infrastructure Services
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: cms-discovery-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - xpack.security.enrollment.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - cms-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.0
+    container_name: cms-discovery-kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - xpack.security.enabled=false
+    ports:
+      - "5601:5601"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - cms-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5601/api/status || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  rabbitmq:
+    image: rabbitmq:3.12-management
+    container_name: cms-discovery-rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+      - RABBITMQ_ERLANG_COOKIE=SWQOKODSQALRPCLNMEQG
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - cms-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: cms-postgres
+    environment:
+      - POSTGRES_DB=cms_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - cms-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d cms_db"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  elasticsearch_data:
+    driver: local
+  rabbitmq_data:
+    driver: local
+  postgres_data:
+    driver: local
+
+networks:
+  cms-network:
+    driver: bridge 
