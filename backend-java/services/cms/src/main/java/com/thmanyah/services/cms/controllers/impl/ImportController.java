@@ -38,9 +38,11 @@ public class ImportController implements ImportControllerV1 {
     String userEmail = authorizationService.getCurrentUserEmail();
 
     log.warn(
-        "⚠️ DEPRECATED: Synchronous import endpoint used by user '{}' for provider '{}'. " +
-        "Consider using /api/v1/import/async/{} for better performance and reliability.",
-        userEmail, provider, provider);
+        "⚠️ DEPRECATED: Synchronous import endpoint used by user '{}' for provider '{}'. "
+            + "Consider using /api/v1/import/async/{} for better performance and reliability.",
+        userEmail,
+        provider,
+        provider);
 
     log.info(
         "Synchronous import request from provider '{}' by user '{}' from {} to {}",

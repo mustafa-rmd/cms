@@ -1,6 +1,5 @@
 package com.thmanyah.services.cms.exception;
 
-
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
@@ -154,8 +153,6 @@ public class GlobalExceptionHandler {
 
     return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
   }
-
-
 
   /** Handle validation errors from @Valid annotations */
   @ExceptionHandler(MethodArgumentNotValidException.class)

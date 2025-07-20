@@ -40,8 +40,12 @@ public class ImportJob {
     RETRYING;
 
     public boolean isActive() {
-      return this == QUEUED || this == IN_PROGRESS || this == PROCESSING ||
-             this == FETCHING || this == SAVING || this == RETRYING;
+      return this == QUEUED
+          || this == IN_PROGRESS
+          || this == PROCESSING
+          || this == FETCHING
+          || this == SAVING
+          || this == RETRYING;
     }
 
     public boolean isTerminal() {

@@ -22,9 +22,9 @@ public interface ImportControllerV1 {
   @Operation(
       summary = "Import shows from external provider (DEPRECATED)",
       description =
-          "⚠️ DEPRECATED: Use /api/v1/import/async/{provider} instead. " +
-          "This synchronous endpoint blocks the request until completion and may timeout for large imports. " +
-          "The async endpoint provides better performance, progress tracking, and fault tolerance.")
+          "⚠️ DEPRECATED: Use /api/v1/import/async/{provider} instead. "
+              + "This synchronous endpoint blocks the request until completion and may timeout for large imports. "
+              + "The async endpoint provides better performance, progress tracking, and fault tolerance.")
   @ApiResponses(
       value = {
         @ApiResponse(

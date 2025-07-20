@@ -1,0 +1,139 @@
+# Test configuration for CMS service
+spring:
+
+  # Database configuration (will be overridden by TestContainers)
+  datasource:
+    url: jdbc:postgresql://localhost:5432/cms_test_db
+    driver-class-name: org.postgresql.Driver
+    username: test_user
+    password: test_password
+  
+  # JPA configuration for tests
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  
+  # Flyway configuration for tests
+  flyway:
+    enabled: true
+    clean-disabled: false
+    locations: classpath:db/migration
+  
+  # RabbitMQ configuration (overridden by TestContainers)
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    virtual-host: /
+
+# Logging configuration for tests
+logging:
+  level:
+    com.thmanyah.services.cms: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG
+    org.testcontainers: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+# CMS specific test configuration
+cms:
+  # Admin user configuration for tests
+  admin:
+    email: test-admin@thmanyah.io
+    password: test-admin-password
+  
+  # JWT configuration for tests
+  jwt:
+    secret: test-secret-key-for-testing-purposes-only-not-for-production-use-must-be-at-least-256-bits
+    access-token-expiration: 3600000  # 1 hour
+    refresh-token-expiration: 86400000 # 24 hours
+  
+  # Event Publishing Configuration for tests
+  events:
+    rabbitmq:
+      exchange: test.cms.events
+      routing-key:
+        show-created: test.show.created
+        show-updated: test.show.updated
+        show-deleted: test.show.deleted
+  
+  # Import Job Processing Configuration for tests
+  import:
+    rabbitmq:
+      exchange: test.cms.import.exchange
+      queue: test.cms.import.queue
+      routing-key: test.import.job
+      dlq: test.cms.import.dlq
+      retry-queue: test.cms.import.retry
+    processing:
+      max-concurrent-jobs: 2
+      job-timeout-minutes: 5
+      max-retries: 2
+  
+  # External providers configuration for tests
+  external-providers:
+    youtube:
+      enabled: false
+      api-key: test-api-key
+      base-url: https://api.youtube.com/v3
+      max-batch-size: 10
+      rate-limit-per-minute: 30
+    vimeo:
+      enabled: false
+      access-token: test-access-token
+      base-url: https://api.vimeo.com
+      max-batch-size: 5
+      rate-limit-per-minute: 20
+    mock:
+      enabled: true
+      max-batch-size: 100
+      rate-limit-per-minute: 1000
+  
+  # CORS Configuration for tests
+  cors:
+    allowed-origins: http://localhost:3000,http://localhost:4200
+    allowed-methods: GET,POST,PUT,DELETE,PATCH,OPTIONS
+    allowed-headers: "*"
+    allow-credentials: true
+    max-age: 3600
+
+# Management endpoints for tests
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+# Test-specific properties
+test:
+  containers:
+    postgres:
+      image: postgres:17.5
+      database: cms_test_db
+      username: test_user
+      password: test_password
+    rabbitmq:
+      image: rabbitmq:3.13-management
+      username: test_user
+      password: test_password
+  
+  data:
+    cleanup: true
+    seed: false
+  
+  timeouts:
+    async-job-processing: 3000
+    message-processing: 1000
+    http-request: 5000
