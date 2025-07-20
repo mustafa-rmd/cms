@@ -1040,10 +1040,11 @@
 			]
 		},
 		{
-			"name": "Import Operations",
+			"name": "Import Operations (DEPRECATED - Use Async)",
+			"description": "⚠️ DEPRECATED: Synchronous import operations. Use 'Async Import Operations' instead for better performance, progress tracking, and fault tolerance.",
 			"item": [
 				{
-					"name": "Import from YouTube",
+					"name": "Import from YouTube (DEPRECATED)",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -1068,7 +1069,7 @@
 					}
 				},
 				{
-					"name": "Import from Vimeo",
+					"name": "Import from Vimeo (DEPRECATED)",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -1093,7 +1094,7 @@
 					}
 				},
 				{
-					"name": "Import from Mock Provider",
+					"name": "Import from Mock Provider (DEPRECATED)",
 					"request": {
 						"method": "POST",
 						"header": [

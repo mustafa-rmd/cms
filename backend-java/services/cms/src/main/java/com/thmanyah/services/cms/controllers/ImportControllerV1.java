@@ -20,19 +20,23 @@ import org.springframework.http.ResponseEntity;
 public interface ImportControllerV1 {
 
   @Operation(
-      summary = "Import shows from external provider",
+      summary = "Import shows from external provider (DEPRECATED)",
       description =
-          "Start an import job to fetch shows from an external provider within a date range")
+          "⚠️ DEPRECATED: Use /api/v1/import/async/{provider} instead. " +
+          "This synchronous endpoint blocks the request until completion and may timeout for large imports. " +
+          "The async endpoint provides better performance, progress tracking, and fault tolerance.")
   @ApiResponses(
       value = {
         @ApiResponse(
             responseCode = "200",
-            description = "Import job started successfully",
+            description = "Import job completed successfully (synchronous)",
             content = @Content(schema = @Schema(implementation = ImportJob.class))),
         @ApiResponse(responseCode = "400", description = "Invalid request parameters"),
         @ApiResponse(responseCode = "404", description = "Provider not found"),
-        @ApiResponse(responseCode = "503", description = "Provider unavailable")
+        @ApiResponse(responseCode = "503", description = "Provider unavailable"),
+        @ApiResponse(responseCode = "408", description = "Request timeout for large imports")
       })
+  @Deprecated
   ResponseEntity<ImportJob> importFromProvider(
       @Parameter(description = "Provider name", example = "youtube") String provider,
       ImportRequest request);
