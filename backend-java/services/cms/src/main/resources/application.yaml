@@ -146,6 +146,14 @@ cms:
       max-concurrent-jobs: ${CMS_IMPORT_MAX_CONCURRENT:5}
       job-timeout-minutes: ${CMS_IMPORT_TIMEOUT:30}
       max-retries: ${CMS_IMPORT_MAX_RETRIES:3}
+
+  # CORS Configuration
+  cors:
+    allowed-origins: ${CMS_CORS_ALLOWED_ORIGINS:http://localhost:4200,http://localhost:3000,http://127.0.0.1:4200,http://127.0.0.1:3000}
+    allowed-methods: ${CMS_CORS_ALLOWED_METHODS:GET,POST,PUT,DELETE,PATCH,OPTIONS}
+    allowed-headers: ${CMS_CORS_ALLOWED_HEADERS:*}
+    allow-credentials: ${CMS_CORS_ALLOW_CREDENTIALS:true}
+    max-age: ${CMS_CORS_MAX_AGE:3600}
   jwt:
     secret: ${JWT_SECRET:mySecretKey1234567890123456789012345678901234567890} # Must be at least 256 bits (32 chars)
     expiration: ${JWT_EXPIRATION:86400000} # 24 hours in milliseconds
