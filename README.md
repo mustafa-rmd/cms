@@ -1,4 +1,4 @@
-# Thmanyah Platform - Content Management System
+Content Management System
 
 A comprehensive platform for content management and discovery, featuring a modern Angular frontend with beautiful animations and a robust Java microservices backend. Built with cutting-edge technologies and inspired by Thmanyah.com's design aesthetic.
 
