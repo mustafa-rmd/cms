@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.annotations.Query;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -124,4 +125,28 @@ public interface ShowRepository extends ElasticsearchRepository<ShowDocument, St
 
   /** Count shows by provider */
   long countByProviderAndIsPublicTrueAndIsActiveTrue(String provider);
+
+  /** Find shows with multiple filters - type and language */
+  Page<ShowDocument> findByTypeAndLanguageAndIsPublicTrueAndIsActiveTrue(
+      String type, String language, Pageable pageable);
+
+  /** Find shows with type, language and duration range */
+  Page<ShowDocument> findByTypeAndLanguageAndDurationSecBetweenAndIsPublicTrueAndIsActiveTrue(
+      String type, String language, Integer minDuration, Integer maxDuration, Pageable pageable);
+
+  /** Find shows with type and duration range */
+  Page<ShowDocument> findByTypeAndDurationSecBetweenAndIsPublicTrueAndIsActiveTrue(
+      String type, Integer minDuration, Integer maxDuration, Pageable pageable);
+
+  /** Find shows with language and duration range */
+  Page<ShowDocument> findByLanguageAndDurationSecBetweenAndIsPublicTrueAndIsActiveTrue(
+      String language, Integer minDuration, Integer maxDuration, Pageable pageable);
+
+  /** Find shows with published date range */
+  Page<ShowDocument> findByPublishedAtBetweenAndIsPublicTrueAndIsActiveTrue(
+      LocalDate startDate, LocalDate endDate, Pageable pageable);
+
+  /** Find shows with rating filter */
+  Page<ShowDocument> findByRatingGreaterThanEqualAndIsPublicTrueAndIsActiveTrue(
+      Double minRating, Pageable pageable);
 }

@@ -5,6 +5,7 @@ import com.thmanyah.services.cmsdiscovery.model.dto.SearchRequest;
 import com.thmanyah.services.cmsdiscovery.model.dto.SearchResponse;
 import com.thmanyah.services.cmsdiscovery.model.dto.ShowSearchDto;
 import com.thmanyah.services.cmsdiscovery.repository.ShowRepository;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +38,7 @@ public class SearchService {
     Page<ShowDocument> searchResults;
 
     if (StringUtils.hasText(request.getQuery())) {
-      // Full-text search
+      // For now, use simple text search - complex filtering with text search can be enhanced later
       searchResults = showRepository.searchByText(request.getQuery(), pageable);
     } else {
       // Browse all shows with filters
@@ -146,9 +147,117 @@ public class SearchService {
   }
 
   private Page<ShowDocument> applyFilters(SearchRequest request, Pageable pageable) {
-    // For now, return all public and active shows
-    // TODO: Implement complex filtering with Elasticsearch queries
+    // Apply filters using repository methods based on available criteria
+
+    // Check for type filter
+    if (StringUtils.hasText(request.getType())) {
+      return applyTypeBasedFilters(request, pageable);
+    }
+
+    // Check for language filter
+    if (StringUtils.hasText(request.getLanguage())) {
+      return applyLanguageBasedFilters(request, pageable);
+    }
+
+    // Check for provider filter
+    if (StringUtils.hasText(request.getProvider())) {
+      return applyProviderBasedFilters(request, pageable);
+    }
+
+    // Check for duration filter
+    if (request.getMinDuration() != null || request.getMaxDuration() != null) {
+      return applyDurationBasedFilters(request, pageable);
+    }
+
+    // Check for date range filter
+    if (request.getPublishedAfter() != null || request.getPublishedBefore() != null) {
+      return applyDateBasedFilters(request, pageable);
+    }
+
+    // Check for rating filter
+    if (request.getMinRating() != null) {
+      return showRepository.findByRatingGreaterThanEqualAndIsPublicTrueAndIsActiveTrue(
+          request.getMinRating(), pageable);
+    }
+
+    // Check for tags filter
+    if (request.getTags() != null && !request.getTags().isEmpty()) {
+      // For now, use the first tag - in a real implementation, you'd want to handle multiple tags
+      return showRepository.findByTagsContainingAndIsPublicTrueAndIsActiveTrue(
+          request.getTags().get(0), pageable);
+    }
+
+    // Check for categories filter
+    if (request.getCategories() != null && !request.getCategories().isEmpty()) {
+      // For now, use the first category - in a real implementation, you'd want to handle multiple categories
+      return showRepository.findByCategoriesContainingAndIsPublicTrueAndIsActiveTrue(
+          request.getCategories().get(0), pageable);
+    }
+
+    // No filters applied, return all public and active shows
     return showRepository.findByIsPublicTrueAndIsActiveTrue(pageable);
+  }
+
+  private Page<ShowDocument> applyTypeBasedFilters(SearchRequest request, Pageable pageable) {
+    String type = request.getType();
+
+    // Type + Language + Duration
+    if (StringUtils.hasText(request.getLanguage()) &&
+        (request.getMinDuration() != null || request.getMaxDuration() != null)) {
+      Integer minDur = request.getMinDuration() != null ? request.getMinDuration() : 0;
+      Integer maxDur = request.getMaxDuration() != null ? request.getMaxDuration() : Integer.MAX_VALUE;
+      return showRepository.findByTypeAndLanguageAndDurationSecBetweenAndIsPublicTrueAndIsActiveTrue(
+          type, request.getLanguage(), minDur, maxDur, pageable);
+    }
+
+    // Type + Language
+    if (StringUtils.hasText(request.getLanguage())) {
+      return showRepository.findByTypeAndLanguageAndIsPublicTrueAndIsActiveTrue(
+          type, request.getLanguage(), pageable);
+    }
+
+    // Type + Duration
+    if (request.getMinDuration() != null || request.getMaxDuration() != null) {
+      Integer minDur = request.getMinDuration() != null ? request.getMinDuration() : 0;
+      Integer maxDur = request.getMaxDuration() != null ? request.getMaxDuration() : Integer.MAX_VALUE;
+      return showRepository.findByTypeAndDurationSecBetweenAndIsPublicTrueAndIsActiveTrue(
+          type, minDur, maxDur, pageable);
+    }
+
+    // Type only
+    return showRepository.findByTypeAndIsPublicTrueAndIsActiveTrue(type, pageable);
+  }
+
+  private Page<ShowDocument> applyLanguageBasedFilters(SearchRequest request, Pageable pageable) {
+    String language = request.getLanguage();
+
+    // Language + Duration
+    if (request.getMinDuration() != null || request.getMaxDuration() != null) {
+      Integer minDur = request.getMinDuration() != null ? request.getMinDuration() : 0;
+      Integer maxDur = request.getMaxDuration() != null ? request.getMaxDuration() : Integer.MAX_VALUE;
+      return showRepository.findByLanguageAndDurationSecBetweenAndIsPublicTrueAndIsActiveTrue(
+          language, minDur, maxDur, pageable);
+    }
+
+    // Language only
+    return showRepository.findByLanguageAndIsPublicTrueAndIsActiveTrue(language, pageable);
+  }
+
+  private Page<ShowDocument> applyProviderBasedFilters(SearchRequest request, Pageable pageable) {
+    // Provider only for now - can be extended for combinations
+    return showRepository.findByProviderAndIsPublicTrueAndIsActiveTrue(request.getProvider(), pageable);
+  }
+
+  private Page<ShowDocument> applyDurationBasedFilters(SearchRequest request, Pageable pageable) {
+    Integer minDur = request.getMinDuration() != null ? request.getMinDuration() : 0;
+    Integer maxDur = request.getMaxDuration() != null ? request.getMaxDuration() : Integer.MAX_VALUE;
+    return showRepository.findByDurationSecBetweenAndIsPublicTrueAndIsActiveTrue(minDur, maxDur, pageable);
+  }
+
+  private Page<ShowDocument> applyDateBasedFilters(SearchRequest request, Pageable pageable) {
+    LocalDate startDate = request.getPublishedAfter() != null ? request.getPublishedAfter() : LocalDate.of(1900, 1, 1);
+    LocalDate endDate = request.getPublishedBefore() != null ? request.getPublishedBefore() : LocalDate.now();
+    return showRepository.findByPublishedAtBetweenAndIsPublicTrueAndIsActiveTrue(startDate, endDate, pageable);
   }
 
   private ShowSearchDto convertToDto(ShowDocument document) {
@@ -237,4 +346,5 @@ public class SearchService {
         .appliedFilters(Map.of("searchType", searchType))
         .build();
   }
+
 }
