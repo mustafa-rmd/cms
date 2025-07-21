@@ -12,17 +12,17 @@ import { ShowSearchDto, SearchResponse } from '../../models/show.model';
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
   popularShows: ShowSearchDto[] = [];
   recentShows: ShowSearchDto[] = [];
   loading = true;
+  private completedRequests = 0;
+  private totalRequests = 2; // popular shows + recent shows
 
   constructor(
     private searchService: SearchService,
     private authService: AuthService
-  ) {
-    this.ngOnInit();
-  }
+  ) {}
 
   isAuthenticated(): boolean {
     return this.authService.isAuthenticated();
@@ -33,13 +33,18 @@ export class HomeComponent {
   }
 
   ngOnInit(): void {
+    this.loading = true;
+    this.completedRequests = 0;
+    
     // Load popular shows
     this.searchService.getPopularShows(0, 6).subscribe({
       next: (response: SearchResponse) => {
         this.popularShows = response.results;
+        this.checkLoadingComplete();
       },
       error: (error) => {
         console.error('Error loading popular shows:', error);
+        this.checkLoadingComplete();
       }
     });
 
@@ -47,11 +52,20 @@ export class HomeComponent {
     this.searchService.getRecentShows(0, 6).subscribe({
       next: (response: SearchResponse) => {
         this.recentShows = response.results;
+        this.checkLoadingComplete();
       },
       error: (error) => {
         console.error('Error loading recent shows:', error);
+        this.checkLoadingComplete();
       }
     });
+  }
+
+  private checkLoadingComplete(): void {
+    this.completedRequests++;
+    if (this.completedRequests >= this.totalRequests) {
+      this.loading = false;
+    }
   }
 
   formatDuration(seconds: number): string {
@@ -65,6 +79,6 @@ export class HomeComponent {
   }
 
   formatDate(dateString: string): string {
-    return new Date(dateString).toLocaleDateString();
+    return new Date(dateString).toLocaleDateString('ar-SA');
   }
 } 
