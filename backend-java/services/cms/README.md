@@ -147,14 +147,19 @@ The table is optimized for write-heavy operations with the following indexes:
 - `GET /api/v1/shows/filtering-values` - Get distinct field values for filtering
 - `GET /api/v1/shows/statistics` - Get show statistics
 
-### Import Operations
+### Import Operations (Async Only)
 
-- `POST /api/v1/import/{provider}` - Start import job from external provider
-- `GET /api/v1/import/jobs/{jobId}` - Get import job status and progress
-- `DELETE /api/v1/import/jobs/{jobId}` - Cancel import job
-- `GET /api/v1/import/jobs` - Get all import jobs
-- `GET /api/v1/import/providers` - Get available providers
-- `GET /api/v1/import/providers/{provider}/health` - Check provider health
+**Note**: All import operations are now asynchronous. The synchronous import endpoints have been removed.
+
+- `POST /api/v1/import/async/{provider}` - Start async import job from external provider
+- `GET /api/v1/import/async/jobs/{jobId}` - Get import job status and progress
+- `POST /api/v1/import/async/jobs/{jobId}/cancel` - Cancel import job
+- `POST /api/v1/import/async/jobs/{jobId}/retry` - Retry failed import job
+- `GET /api/v1/import/async/jobs/my` - Get current user's import jobs
+- `GET /api/v1/import/async/jobs` - Get all import jobs (admin only)
+- `GET /api/v1/import/async/jobs?status={status}` - Get import jobs by status
+- `GET /api/v1/import/async/stats` - Get import statistics
+- `GET /api/v1/import/async/providers` - Get available providers
 
 ### Health and Monitoring
 
