@@ -266,6 +266,9 @@ public class ShowServiceImpl implements ShowService {
     Show savedShow = showRepository.save(show);
     log.info("Successfully imported show with ID: {}", savedShow.getId());
 
+    // Publish show created event for discovery service
+    eventPublisherService.publishShowCreatedEvent(savedShow);
+
     return savedShow;
   }
 
@@ -308,6 +311,12 @@ public class ShowServiceImpl implements ShowService {
     List<Show> savedShows = showRepository.saveAll(showsToSave);
     showRepository.flush(); // Force immediate persistence
     log.info("Successfully batch imported {} shows", savedShows.size());
+
+    // Publish show created events for each imported show
+    for (Show savedShow : savedShows) {
+      eventPublisherService.publishShowCreatedEvent(savedShow);
+    }
+    log.info("Published {} show created events to discovery service", savedShows.size());
 
     return savedShows;
   }
