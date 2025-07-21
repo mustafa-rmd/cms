@@ -51,13 +51,13 @@ export class ShowsComponent implements OnInit {
     const minutes = Math.floor((seconds % 3600) / 60);
     
     if (hours > 0) {
-      return `${hours}h ${minutes}m`;
+      return `${hours}س ${minutes}د`;
     }
-    return `${minutes}m`;
+    return `${minutes}د`;
   }
 
   formatDate(dateString: string): string {
-    return new Date(dateString).toLocaleDateString();
+    return new Date(dateString).toLocaleDateString('ar-SA');
   }
 
   getPageNumbers(): number[] {
