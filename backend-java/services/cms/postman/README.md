@@ -6,9 +6,9 @@ This Postman collection provides comprehensive API testing for the Thmanyah Cont
 
 The CMS Service manages shows (podcasts and documentaries) with full CRUD operations, filtering capabilities, user management, and both synchronous and asynchronous external content import functionality.
 
-## ⚠️ Important: Import Operations Migration
+## ✅ Import Operations
 
-**Synchronous import operations are now DEPRECATED.** Please use the **Async Import Operations** for all new integrations:
+**All import operations are now asynchronous.** The synchronous import endpoints have been completely removed. Use the **Async Import Operations** for all integrations:
 
 | Feature | Synchronous (DEPRECATED) | Async (RECOMMENDED) |
 |---------|--------------------------|---------------------|
@@ -74,28 +74,6 @@ The CMS Service manages shows (podcasts and documentaries) with full CRUD operat
 - **Get Import Jobs by Status**: Filter jobs by status (QUEUED, PROCESSING, COMPLETED, etc.)
 - **Get Import Statistics**: Comprehensive import metrics and analytics
 - **Get Available Providers (Async)**: Provider info with rate limits and batch sizes
-
-### 8. Import Operations (DEPRECATED - Use Async)
-⚠️ **DEPRECATED**: These synchronous import operations are deprecated in favor of async operations.
-
-- **Import from YouTube (DEPRECATED)**: Blocking YouTube import (may timeout)
-- **Import from Vimeo (DEPRECATED)**: Blocking Vimeo import (may timeout)
-- **Import from Mock Provider (DEPRECATED)**: Blocking mock import (may timeout)
-- **Get Import Job Status**: Monitor import progress (still useful for utility)
-- **Cancel Import Job**: Stop running imports (still useful for utility)
-- **Get All Import Jobs**: List import history (still useful for utility)
-- **Get Available Providers**: List supported providers (still useful for utility)
-- **Check Provider Health**: Verify provider connectivity (still useful for utility)
-
-**Import Request Format:**
-```json
-{
-  "topic": "education",
-  "startDate": "2024-01-01",
-  "endDate": "2024-01-31",
-  "skipDuplicates": true
-}
-```
 
 ## 🚀 Async Import Operations Features
 
