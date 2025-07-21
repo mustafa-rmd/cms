@@ -11,6 +11,7 @@ export class SearchService {
 
   constructor(private http: HttpClient) { }
 
+  // Basic Search Operations
   searchShows(
     query: string,
     type?: string,
@@ -53,12 +54,30 @@ export class SearchService {
     return this.http.get<SearchResponse>(`${this.API_URL}/search`, { params });
   }
 
+  // Advanced Search with POST request
   advancedSearch(searchRequest: SearchRequest): Observable<SearchResponse> {
-    return this.http.post<SearchResponse>(`${this.API_URL}/search/advanced`, searchRequest);
+    return this.http.post<SearchResponse>(`${this.API_URL}/search`, searchRequest);
   }
 
+  // Browse all content without query
+  browseAllContent(
+    sortBy: string = 'createdDate',
+    sortDirection: 'asc' | 'desc' = 'desc',
+    page: number = 0,
+    size: number = 20
+  ): Observable<SearchResponse> {
+    const params = new HttpParams()
+      .set('sortBy', sortBy)
+      .set('sortDirection', sortDirection)
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    return this.http.get<SearchResponse>(`${this.API_URL}/search`, { params });
+  }
+
+  // Content Discovery
   getShowById(showId: string): Observable<ShowSearchDto> {
-    return this.http.get<ShowSearchDto>(`${this.API_URL}/search/show/${showId}`);
+    return this.http.get<ShowSearchDto>(`${this.API_URL}/shows/${showId}`);
   }
 
   getPopularShows(page: number = 0, size: number = 20): Observable<SearchResponse> {
@@ -66,7 +85,7 @@ export class SearchService {
       .set('page', page.toString())
       .set('size', size.toString());
     
-    return this.http.get<SearchResponse>(`${this.API_URL}/search/popular`, { params });
+    return this.http.get<SearchResponse>(`${this.API_URL}/shows/popular`, { params });
   }
 
   getRecentShows(page: number = 0, size: number = 20): Observable<SearchResponse> {
@@ -74,23 +93,33 @@ export class SearchService {
       .set('page', page.toString())
       .set('size', size.toString());
     
-    return this.http.get<SearchResponse>(`${this.API_URL}/search/recent`, { params });
+    return this.http.get<SearchResponse>(`${this.API_URL}/shows/recent`, { params });
   }
 
+  // Content Filtering by Type
   getShowsByType(type: string, page: number = 0, size: number = 20): Observable<SearchResponse> {
     const params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
     
-    return this.http.get<SearchResponse>(`${this.API_URL}/search/type/${type}`, { params });
+    return this.http.get<SearchResponse>(`${this.API_URL}/shows/type/${type}`, { params });
   }
 
+  getPodcasts(page: number = 0, size: number = 20): Observable<SearchResponse> {
+    return this.getShowsByType('podcast', page, size);
+  }
+
+  getDocumentaries(page: number = 0, size: number = 20): Observable<SearchResponse> {
+    return this.getShowsByType('documentary', page, size);
+  }
+
+  // Content Filtering by Tags and Categories
   getShowsByTag(tag: string, page: number = 0, size: number = 20): Observable<SearchResponse> {
     const params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
     
-    return this.http.get<SearchResponse>(`${this.API_URL}/search/tag/${tag}`, { params });
+    return this.http.get<SearchResponse>(`${this.API_URL}/shows/tag/${tag}`, { params });
   }
 
   getShowsByCategory(category: string, page: number = 0, size: number = 20): Observable<SearchResponse> {
@@ -98,6 +127,106 @@ export class SearchService {
       .set('page', page.toString())
       .set('size', size.toString());
     
-    return this.http.get<SearchResponse>(`${this.API_URL}/search/category/${category}`, { params });
+    return this.http.get<SearchResponse>(`${this.API_URL}/shows/category/${category}`, { params });
+  }
+
+  // Search with specific filters
+  searchByDateRange(
+    query: string,
+    publishedAfter: string,
+    publishedBefore: string,
+    minRating?: number,
+    sortBy: string = 'publishedAt',
+    sortDirection: 'asc' | 'desc' = 'desc',
+    page: number = 0,
+    size: number = 20
+  ): Observable<SearchResponse> {
+    let params = new HttpParams()
+      .set('query', query)
+      .set('publishedAfter', publishedAfter)
+      .set('publishedBefore', publishedBefore)
+      .set('sortBy', sortBy)
+      .set('sortDirection', sortDirection)
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    if (minRating) params = params.set('minRating', minRating.toString());
+
+    return this.http.get<SearchResponse>(`${this.API_URL}/search`, { params });
+  }
+
+  searchByDuration(
+    query: string,
+    minDuration: number,
+    maxDuration: number,
+    sortBy: string = 'durationSec',
+    sortDirection: 'asc' | 'desc' = 'asc',
+    page: number = 0,
+    size: number = 20
+  ): Observable<SearchResponse> {
+    const params = new HttpParams()
+      .set('query', query)
+      .set('minDuration', minDuration.toString())
+      .set('maxDuration', maxDuration.toString())
+      .set('sortBy', sortBy)
+      .set('sortDirection', sortDirection)
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    return this.http.get<SearchResponse>(`${this.API_URL}/search`, { params });
+  }
+
+  searchByProvider(
+    query: string,
+    provider: string,
+    sortBy: string = 'relevance',
+    sortDirection: 'asc' | 'desc' = 'desc',
+    page: number = 0,
+    size: number = 20
+  ): Observable<SearchResponse> {
+    const params = new HttpParams()
+      .set('query', query)
+      .set('provider', provider)
+      .set('sortBy', sortBy)
+      .set('sortDirection', sortDirection)
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    return this.http.get<SearchResponse>(`${this.API_URL}/search`, { params });
+  }
+
+  // Fuzzy search with typos
+  fuzzySearch(
+    query: string,
+    highlight: boolean = true,
+    page: number = 0,
+    size: number = 20
+  ): Observable<SearchResponse> {
+    const params = new HttpParams()
+      .set('query', query)
+      .set('fuzzy', 'true')
+      .set('highlight', highlight.toString())
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    return this.http.get<SearchResponse>(`${this.API_URL}/search`, { params });
+  }
+
+  // Sort by different fields
+  searchWithSorting(
+    query: string,
+    sortBy: 'relevance' | 'rating' | 'viewCount' | 'publishedAt' | 'durationSec' | 'createdDate',
+    sortDirection: 'asc' | 'desc' = 'desc',
+    page: number = 0,
+    size: number = 20
+  ): Observable<SearchResponse> {
+    const params = new HttpParams()
+      .set('query', query)
+      .set('sortBy', sortBy)
+      .set('sortDirection', sortDirection)
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    return this.http.get<SearchResponse>(`${this.API_URL}/search`, { params });
   }
 } 

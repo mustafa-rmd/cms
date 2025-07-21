@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { SearchService } from '../../services/search.service';
-import { ShowSearchDto } from '../../models/show.model';
+import { AuthService } from '../../services/auth.service';
+import { ShowSearchDto, SearchResponse } from '../../models/show.model';
 
 @Component({
   selector: 'app-home',
@@ -16,17 +17,26 @@ export class HomeComponent {
   recentShows: ShowSearchDto[] = [];
   loading = true;
 
-  constructor(private searchService: SearchService) {
-    this.loadHomeData();
+  constructor(
+    private searchService: SearchService,
+    private authService: AuthService
+  ) {
+    this.ngOnInit();
   }
 
-  private loadHomeData(): void {
-    this.loading = true;
-    
+  isAuthenticated(): boolean {
+    return this.authService.isAuthenticated();
+  }
+
+  hasRole(role: string): boolean {
+    return this.authService.hasRole(role);
+  }
+
+  ngOnInit(): void {
     // Load popular shows
     this.searchService.getPopularShows(0, 6).subscribe({
-      next: (response) => {
-        this.popularShows = response.content;
+      next: (response: SearchResponse) => {
+        this.popularShows = response.results;
       },
       error: (error) => {
         console.error('Error loading popular shows:', error);
@@ -35,13 +45,11 @@ export class HomeComponent {
 
     // Load recent shows
     this.searchService.getRecentShows(0, 6).subscribe({
-      next: (response) => {
-        this.recentShows = response.content;
-        this.loading = false;
+      next: (response: SearchResponse) => {
+        this.recentShows = response.results;
       },
       error: (error) => {
         console.error('Error loading recent shows:', error);
-        this.loading = false;
       }
     });
   }

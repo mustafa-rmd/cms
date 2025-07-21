@@ -22,11 +22,28 @@ export interface ShowCreateUpdateDto {
   publishedAt: string;
 }
 
-export interface ShowSearchDto extends Show {
+export interface ShowSearchDto {
+  showId: string;
+  title: string;
+  description: string;
+  type: 'podcast' | 'documentary';
+  language: string;
+  durationSec: number;
+  publishedAt: string;
+  provider: string;
+  externalId?: string;
   tags?: string[];
   categories?: string[];
-  rating?: number;
+  thumbnailUrl?: string;
+  streamUrl?: string;
   viewCount?: number;
+  rating?: number;
+  createdDate: string;
+  updatedDate: string;
+  createdBy: string;
+  updatedBy: string;
+  score?: number;
+  highlights?: string[];
 }
 
 export interface SearchRequest {
@@ -50,11 +67,22 @@ export interface SearchRequest {
 }
 
 export interface SearchResponse {
-  content: ShowSearchDto[];
-  totalElements: number;
+  results: ShowSearchDto[];
+  totalResults: number;
   totalPages: number;
-  size: number;
-  number: number;
-  first: boolean;
-  last: boolean;
+  currentPage: number;
+  pageSize: number;
+  hasNext: boolean;
+  hasPrevious: boolean;
+  executionTimeMs: number;
+  appliedFilters?: Record<string, any>;
+  metadata?: {
+    originalQuery?: string;
+    processedQuery?: string;
+    searchType?: string;
+    fuzzyApplied?: boolean;
+    highlightApplied?: boolean;
+  };
+  suggestions?: string[];
+  aggregations?: Record<string, Record<string, number>>;
 } 

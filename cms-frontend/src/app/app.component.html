@@ -20,21 +20,29 @@
             <i class="bi bi-search me-1"></i>البحث
           </a>
         </li>
-        <li class="nav-item" *ngIf="isAuthenticated()">
-          <a class="nav-link" routerLink="/shows" routerLinkActive="active">
-            <i class="bi bi-collection me-1"></i>العروض
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/browse" routerLinkActive="active">
+            <i class="bi bi-collection-play me-1"></i>استكشف
           </a>
         </li>
-        <li class="nav-item" *ngIf="isAuthenticated() && hasRole('ADMIN')">
-          <a class="nav-link" routerLink="/users" routerLinkActive="active">
-            <i class="bi bi-people me-1"></i>المستخدمين
-          </a>
-        </li>
-        <li class="nav-item" *ngIf="isAuthenticated()">
-          <a class="nav-link" routerLink="/import" routerLinkActive="active">
-            <i class="bi bi-upload me-1"></i>الاستيراد
-          </a>
-        </li>
+        <!-- Only show authenticated features to authenticated users -->
+        <ng-container *ngIf="isAuthenticated()">
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/shows" routerLinkActive="active">
+              <i class="bi bi-collection me-1"></i>العروض
+            </a>
+          </li>
+          <li class="nav-item" *ngIf="hasRole('ADMIN')">
+            <a class="nav-link" routerLink="/users" routerLinkActive="active">
+              <i class="bi bi-people me-1"></i>المستخدمين
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/import" routerLinkActive="active">
+              <i class="bi bi-upload me-1"></i>الاستيراد
+            </a>
+          </li>
+        </ng-container>
       </ul>
       
       <ul class="navbar-nav">

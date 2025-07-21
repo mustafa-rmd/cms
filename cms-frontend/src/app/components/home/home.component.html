@@ -56,9 +56,13 @@
                   </div>
                   <div class="d-flex justify-content-between align-items-center">
                     <span class="badge bg-info">{{ show.language.toUpperCase() }}</span>
-                    <a [routerLink]="['/shows', show.id]" class="btn btn-primary btn-sm">
+                    <!-- Only show detail link for authenticated users -->
+                    <a *ngIf="isAuthenticated()" [routerLink]="['/shows', show.showId]" class="btn btn-primary btn-sm">
                       <i class="bi bi-eye me-1"></i>عرض التفاصيل
                     </a>
+                    <span *ngIf="!isAuthenticated()" class="text-muted small">
+                      <i class="bi bi-lock me-1"></i>تسجيل الدخول مطلوب
+                    </span>
                   </div>
                 </div>
               </div>
@@ -100,9 +104,13 @@
                   </div>
                   <div class="d-flex justify-content-between align-items-center">
                     <span class="badge bg-info">{{ show.language.toUpperCase() }}</span>
-                    <a [routerLink]="['/shows', show.id]" class="btn btn-primary btn-sm">
+                    <!-- Only show detail link for authenticated users -->
+                    <a *ngIf="isAuthenticated()" [routerLink]="['/shows', show.showId]" class="btn btn-primary btn-sm">
                       <i class="bi bi-eye me-1"></i>عرض التفاصيل
                     </a>
+                    <span *ngIf="!isAuthenticated()" class="text-muted small">
+                      <i class="bi bi-lock me-1"></i>تسجيل الدخول مطلوب
+                    </span>
                   </div>
                 </div>
               </div>
@@ -112,8 +120,8 @@
       </div>
     </div>
 
-    <!-- Quick Actions -->
-    <div class="row">
+    <!-- Quick Actions - Only show to authenticated users -->
+    <div class="row" *ngIf="isAuthenticated()">
       <div class="col-12">
         <h2 class="mb-4 text-center fade-in-up">
           <i class="bi bi-lightning text-warning me-2 floating"></i>إجراءات سريعة
@@ -137,12 +145,12 @@
             <div class="card text-center action-card h-100">
               <div class="card-body d-flex flex-column">
                 <div class="mb-3">
-                  <i class="bi bi-collection display-4 text-success floating"></i>
+                  <i class="bi bi-collection-play display-4 text-success floating"></i>
                 </div>
-                <h5 class="card-title">تصفح العروض</h5>
-                <p class="card-text flex-grow-1">عرض جميع المحتويات المتاحة</p>
-                <a routerLink="/shows" class="btn btn-success mt-auto">
-                  <i class="bi bi-collection me-1"></i>التصفح
+                <h5 class="card-title">استكشف المحتوى</h5>
+                <p class="card-text flex-grow-1">تصفح المحتوى حسب النوع والفئة والعلامات</p>
+                <a routerLink="/browse" class="btn btn-success mt-auto">
+                  <i class="bi bi-collection-play me-1"></i>الاستكشاف
                 </a>
               </div>
             </div>
@@ -151,12 +159,12 @@
             <div class="card text-center action-card h-100">
               <div class="card-body d-flex flex-column">
                 <div class="mb-3">
-                  <i class="bi bi-upload display-4 text-warning floating"></i>
+                  <i class="bi bi-mic display-4 text-info floating"></i>
                 </div>
-                <h5 class="card-title">استيراد المحتوى</h5>
-                <p class="card-text flex-grow-1">استيراد من مزودي المحتوى الخارجيين</p>
-                <a routerLink="/import" class="btn btn-warning mt-auto">
-                  <i class="bi bi-upload me-1"></i>الاستيراد
+                <h5 class="card-title">البودكاست</h5>
+                <p class="card-text flex-grow-1">اكتشف مجموعة متنوعة من البودكاست المميزة</p>
+                <a routerLink="/search" [queryParams]="{type: 'podcast'}" class="btn btn-info mt-auto">
+                  <i class="bi bi-mic me-1"></i>استكشف البودكاست
                 </a>
               </div>
             </div>
@@ -165,15 +173,34 @@
             <div class="card text-center action-card h-100">
               <div class="card-body d-flex flex-column">
                 <div class="mb-3">
-                  <i class="bi bi-people display-4 text-info floating"></i>
+                  <i class="bi bi-camera-video display-4 text-warning floating"></i>
                 </div>
-                <h5 class="card-title">إدارة المستخدمين</h5>
-                <p class="card-text flex-grow-1">إدارة المستخدمين والصلاحيات</p>
-                <a routerLink="/users" class="btn btn-info mt-auto">
-                  <i class="bi bi-people me-1"></i>الإدارة
+                <h5 class="card-title">الأفلام الوثائقية</h5>
+                <p class="card-text flex-grow-1">شاهد مجموعة رائعة من الأفلام الوثائقية</p>
+                <a routerLink="/search" [queryParams]="{type: 'documentary'}" class="btn btn-warning mt-auto">
+                  <i class="bi bi-camera-video me-1"></i>استكشف الأفلام
                 </a>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Login Prompt for Unauthenticated Users -->
+    <div class="row" *ngIf="!isAuthenticated()">
+      <div class="col-12">
+        <div class="card text-center border-primary">
+          <div class="card-body">
+            <h3 class="card-title text-primary">
+              <i class="bi bi-lock me-2"></i>تسجيل الدخول مطلوب
+            </h3>
+            <p class="card-text">
+              للوصول إلى جميع الميزات وإدارة المحتوى، يرجى تسجيل الدخول إلى حسابك.
+            </p>
+            <a routerLink="/login" class="btn btn-primary btn-lg">
+              <i class="bi bi-box-arrow-in-right me-2"></i>تسجيل الدخول
+            </a>
           </div>
         </div>
       </div>

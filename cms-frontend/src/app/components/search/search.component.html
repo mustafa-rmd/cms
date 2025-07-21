@@ -1,4 +1,5 @@
 <div class="container fade-in">
+  <!-- Search Form -->
   <div class="row">
     <div class="col-12">
       <div class="card">
@@ -9,6 +10,7 @@
         </div>
         <div class="card-body">
           <form [formGroup]="searchForm" (ngSubmit)="onSearch()" class="fade-in-up" style="animation-delay: 0.1s;">
+            <!-- Basic Search -->
             <div class="row">
               <div class="col-md-6 mb-3">
                 <label for="query" class="form-label">
@@ -44,6 +46,8 @@
                 </select>
               </div>
             </div>
+
+            <!-- Advanced Filters -->
             <div class="row">
               <div class="col-md-3 mb-3">
                 <label for="provider" class="form-label">
@@ -61,8 +65,20 @@
                 </label>
                 <select class="form-select" id="sortBy" formControlName="sortBy">
                   <option value="relevance">الأكثر صلة</option>
-                  <option value="date">التاريخ</option>
-                  <option value="duration">المدة</option>
+                  <option value="rating">التقييم</option>
+                  <option value="viewCount">عدد المشاهدات</option>
+                  <option value="publishedAt">تاريخ النشر</option>
+                  <option value="durationSec">المدة</option>
+                  <option value="createdDate">تاريخ الإنشاء</option>
+                </select>
+              </div>
+              <div class="col-md-3 mb-3">
+                <label for="sortDirection" class="form-label">
+                  <i class="bi bi-arrow-up-down me-1"></i>اتجاه الترتيب
+                </label>
+                <select class="form-select" id="sortDirection" formControlName="sortDirection">
+                  <option value="desc">تنازلي</option>
+                  <option value="asc">تصاعدي</option>
                 </select>
               </div>
               <div class="col-md-3 mb-3">
@@ -73,7 +89,53 @@
                   <option value="10">10</option>
                   <option value="20">20</option>
                   <option value="50">50</option>
+                  <option value="100">100</option>
                 </select>
+              </div>
+            </div>
+
+            <!-- Duration Filters -->
+            <div class="row">
+              <div class="col-md-3 mb-3">
+                <label for="minDuration" class="form-label">
+                  <i class="bi bi-clock me-1"></i>الحد الأدنى للمدة (دقيقة)
+                </label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="minDuration"
+                  formControlName="minDuration"
+                  placeholder="0"
+                  min="0"
+                >
+              </div>
+              <div class="col-md-3 mb-3">
+                <label for="maxDuration" class="form-label">
+                  <i class="bi bi-clock me-1"></i>الحد الأقصى للمدة (دقيقة)
+                </label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="maxDuration"
+                  formControlName="maxDuration"
+                  placeholder="120"
+                  min="0"
+                >
+              </div>
+              <div class="col-md-3 mb-3">
+                <label for="minRating" class="form-label">
+                  <i class="bi bi-star me-1"></i>الحد الأدنى للتقييم
+                </label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="minRating"
+                  formControlName="minRating"
+                  placeholder="0"
+                  min="0"
+                  max="5"
+                  step="0.1"
+                >
               </div>
               <div class="col-md-3 mb-3 d-flex align-items-end">
                 <button type="submit" class="btn btn-primary w-100" [disabled]="loading">
@@ -83,6 +145,99 @@
                 </button>
               </div>
             </div>
+
+            <!-- Date Range Filters -->
+            <div class="row">
+              <div class="col-md-3 mb-3">
+                <label for="publishedAfter" class="form-label">
+                  <i class="bi bi-calendar-plus me-1"></i>من تاريخ
+                </label>
+                <input
+                  type="date"
+                  class="form-control"
+                  id="publishedAfter"
+                  formControlName="publishedAfter"
+                >
+              </div>
+              <div class="col-md-3 mb-3">
+                <label for="publishedBefore" class="form-label">
+                  <i class="bi bi-calendar-minus me-1"></i>إلى تاريخ
+                </label>
+                <input
+                  type="date"
+                  class="form-control"
+                  id="publishedBefore"
+                  formControlName="publishedBefore"
+                >
+              </div>
+              <div class="col-md-3 mb-3">
+                <label for="tags" class="form-label">
+                  <i class="bi bi-tags me-1"></i>العلامات (مفصولة بفواصل)
+                </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="tags"
+                  formControlName="tags"
+                  placeholder="technology, science, education"
+                >
+              </div>
+              <div class="col-md-3 mb-3">
+                <label for="categories" class="form-label">
+                  <i class="bi bi-collection me-1"></i>الفئات (مفصولة بفواصل)
+                </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="categories"
+                  formControlName="categories"
+                  placeholder="Science, Technology, Education"
+                >
+              </div>
+            </div>
+
+            <!-- Search Options -->
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="highlight" formControlName="highlight">
+                  <label class="form-check-label" for="highlight">
+                    <i class="bi bi-highlighter me-1"></i>تمييز النتائج
+                  </label>
+                </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="fuzzy" formControlName="fuzzy">
+                  <label class="form-check-label" for="fuzzy">
+                    <i class="bi bi-search-heart me-1"></i>البحث الضبابي (يتجاهل الأخطاء الإملائية)
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="row">
+              <div class="col-12">
+                <div class="d-flex gap-2 flex-wrap">
+                  <button type="button" class="btn btn-outline-secondary btn-sm" (click)="clearSearch()">
+                    <i class="bi bi-arrow-clockwise me-1"></i>إعادة تعيين
+                  </button>
+                  <button type="button" class="btn btn-outline-info btn-sm" (click)="loadPopularShows()">
+                    <i class="bi bi-fire me-1"></i>العروض الشائعة
+                  </button>
+                  <button type="button" class="btn btn-outline-success btn-sm" (click)="loadRecentShows()">
+                    <i class="bi bi-clock-history me-1"></i>أحدث العروض
+                  </button>
+                  <button type="button" class="btn btn-outline-primary btn-sm" (click)="loadPodcasts()">
+                    <i class="bi bi-mic me-1"></i>البودكاست
+                  </button>
+                  <button type="button" class="btn btn-outline-warning btn-sm" (click)="loadDocumentaries()">
+                    <i class="bi bi-camera-video me-1"></i>الأفلام الوثائقية
+                  </button>
+                </div>
+              </div>
+            </div>
           </form>
         </div>
       </div>
@@ -90,24 +245,49 @@
   </div>
 
   <!-- Search Results -->
-  <div class="row mt-4" *ngIf="searchResults.length > 0">
+  <div class="row mt-4" *ngIf="searchResults.length > 0 || (searched && searchResults.length === 0)">
     <div class="col-12">
       <div class="d-flex justify-content-between align-items-center mb-3 fade-in-up">
         <h4 class="mb-0">
           <i class="bi bi-list-check me-2 floating"></i>نتائج البحث ({{ totalResults }})
         </h4>
-        <div class="text-muted">
-          الصفحة {{ currentPage }} من {{ totalPages }}
+        <div class="d-flex align-items-center gap-3">
+          <!-- View Mode Switcher -->
+          <div class="btn-group" role="group" aria-label="View mode switcher">
+            <button 
+              type="button" 
+              class="btn btn-outline-primary" 
+              [class.active]="viewMode === 'cards'"
+              (click)="setViewMode('cards')"
+              title="عرض البطاقات">
+              <i class="bi bi-grid-3x3-gap"></i>
+            </button>
+            <button 
+              type="button" 
+              class="btn btn-outline-primary" 
+              [class.active]="viewMode === 'table'"
+              (click)="setViewMode('table')"
+              title="عرض الجدول">
+              <i class="bi bi-table"></i>
+            </button>
+          </div>
+          <div class="text-muted">
+            الصفحة {{ currentPage }} من {{ totalPages }}
+          </div>
         </div>
       </div>
       
-      <div class="row">
+      <!-- Card View -->
+      <div class="row" *ngIf="viewMode === 'cards' && searchResults.length > 0">
         <div class="col-lg-4 col-md-6 mb-4 stagger-item" *ngFor="let show of searchResults; let i = index">
           <div class="card h-100 show-card" [style.animation-delay]="(i * 0.1) + 's'">
             <div class="card-body d-flex flex-column">
               <div class="mb-3">
                 <span class="badge bg-primary mb-2">{{ show.type === 'podcast' ? 'بودكاست' : 'فيلم وثائقي' }}</span>
                 <span class="badge bg-secondary">{{ show.provider }}</span>
+                <span *ngIf="show.rating" class="badge bg-warning text-dark">
+                  <i class="bi bi-star-fill me-1"></i>{{ show.rating.toFixed(1) }}
+                </span>
               </div>
               <h5 class="card-title flex-grow-1">{{ show.title }}</h5>
               <p class="card-text text-muted flex-grow-1">{{ show.description | slice:0:120 }}...</p>
@@ -122,9 +302,13 @@
                 </div>
                 <div class="d-flex justify-content-between align-items-center">
                   <span class="badge bg-info">{{ show.language.toUpperCase() }}</span>
-                  <a [routerLink]="['/shows', show.id]" class="btn btn-primary btn-sm">
+                  <!-- Only show detail link for authenticated users -->
+                  <a *ngIf="isAuthenticated()" [routerLink]="['/shows', show.showId]" class="btn btn-primary btn-sm">
                     <i class="bi bi-eye me-1"></i>عرض التفاصيل
                   </a>
+                  <span *ngIf="!isAuthenticated()" class="text-muted small">
+                    <i class="bi bi-lock me-1"></i>تسجيل الدخول مطلوب
+                  </span>
                 </div>
               </div>
             </div>
@@ -132,8 +316,64 @@
         </div>
       </div>
 
+      <!-- Table View -->
+      <div class="table-responsive" *ngIf="viewMode === 'table' && searchResults.length > 0">
+        <table class="table table-hover">
+          <thead class="table-light">
+            <tr>
+              <th>العنوان</th>
+              <th>النوع</th>
+              <th>المزود</th>
+              <th>اللغة</th>
+              <th>المدة</th>
+              <th>التقييم</th>
+              <th>تاريخ النشر</th>
+              <th>الإجراءات</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let show of searchResults">
+              <td>
+                <div>
+                  <strong>{{ show.title }}</strong>
+                  <br>
+                  <small class="text-muted">{{ show.description | slice:0:80 }}...</small>
+                </div>
+              </td>
+              <td>
+                <span class="badge" [class]="show.type === 'podcast' ? 'bg-primary' : 'bg-success'">
+                  {{ show.type === 'podcast' ? 'بودكاست' : 'فيلم وثائقي' }}
+                </span>
+              </td>
+              <td>
+                <span class="badge bg-secondary">{{ show.provider }}</span>
+              </td>
+              <td>
+                <span class="badge bg-info">{{ show.language.toUpperCase() }}</span>
+              </td>
+              <td>{{ formatDuration(show.durationSec) }}</td>
+              <td>
+                <span *ngIf="show.rating" class="badge bg-warning text-dark">
+                  <i class="bi bi-star-fill me-1"></i>{{ show.rating.toFixed(1) }}
+                </span>
+                <span *ngIf="!show.rating" class="text-muted">-</span>
+              </td>
+              <td>{{ formatDate(show.publishedAt) }}</td>
+              <td>
+                <a *ngIf="isAuthenticated()" [routerLink]="['/shows', show.showId]" class="btn btn-primary btn-sm">
+                  <i class="bi bi-eye me-1"></i>عرض
+                </a>
+                <span *ngIf="!isAuthenticated()" class="text-muted small">
+                  <i class="bi bi-lock me-1"></i>تسجيل الدخول
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
       <!-- Pagination -->
-      <nav *ngIf="totalPages > 1" class="fade-in-up" style="animation-delay: 0.5s;">
+      <nav *ngIf="totalPages > 1 && searchResults.length > 0" class="fade-in-up" style="animation-delay: 0.5s;">
         <ul class="pagination justify-content-center">
           <li class="page-item" [class.disabled]="currentPage === 1">
             <a class="page-link" href="#" (click)="onPageChange(currentPage - 1); $event.preventDefault()">

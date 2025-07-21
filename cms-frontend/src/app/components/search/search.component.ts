@@ -3,7 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { SearchService } from '../../services/search.service';
+import { AuthService } from '../../services/auth.service';
 import { SearchResponse, ShowSearchDto } from '../../models/show.model';
+
+type ViewMode = 'cards' | 'table';
 
 @Component({
   selector: 'app-search',
@@ -23,24 +26,44 @@ export class SearchComponent implements OnInit {
   pageSize = 20;
   hasSearched = false;
   searched = false;
+  viewMode: ViewMode = 'cards';
 
   constructor(
     private fb: FormBuilder,
-    private searchService: SearchService
+    private searchService: SearchService,
+    private authService: AuthService
   ) {
     this.searchForm = this.fb.group({
       query: [''],
       type: [''],
       language: [''],
       provider: [''],
+      tags: [''],
+      categories: [''],
+      minDuration: [''],
+      maxDuration: [''],
+      publishedAfter: [''],
+      publishedBefore: [''],
+      minRating: [''],
       sortBy: ['relevance'],
-      pageSize: [20]
+      sortDirection: ['desc'],
+      pageSize: [20],
+      highlight: [true],
+      fuzzy: [true]
     });
   }
 
   ngOnInit(): void {
     // Load popular shows on initial load
     this.loadPopularShows();
+  }
+
+  isAuthenticated(): boolean {
+    return this.authService.isAuthenticated();
+  }
+
+  setViewMode(mode: ViewMode): void {
+    this.viewMode = mode;
   }
 
   onSearch(): void {
@@ -52,28 +75,34 @@ export class SearchComponent implements OnInit {
 
       const formValue = this.searchForm.value;
       
+      // Convert duration from minutes to seconds
+      const minDuration = formValue.minDuration ? formValue.minDuration * 60 : undefined;
+      const maxDuration = formValue.maxDuration ? formValue.maxDuration * 60 : undefined;
+      
       this.searchService.searchShows(
         formValue.query,
         formValue.type,
         formValue.language,
         formValue.provider,
-        '', // tags
-        '', // categories
-        undefined, // minDuration
-        undefined, // maxDuration
-        '', // publishedAfter
-        '', // publishedBefore
-        undefined, // minRating
+        formValue.tags,
+        formValue.categories,
+        minDuration,
+        maxDuration,
+        formValue.publishedAfter,
+        formValue.publishedBefore,
+        formValue.minRating,
         formValue.sortBy,
-        'desc', // sortDirection
+        formValue.sortDirection,
         this.currentPage - 1, // API expects 0-based index
-        formValue.pageSize || this.pageSize
+        formValue.pageSize || this.pageSize,
+        formValue.highlight,
+        formValue.fuzzy
       ).subscribe({
         next: (response: SearchResponse) => {
-          this.searchResults = response.content;
+          this.searchResults = response.results;
           this.totalPages = response.totalPages;
-          this.totalElements = response.totalElements;
-          this.totalResults = response.totalElements;
+          this.totalElements = response.totalResults;
+          this.totalResults = response.totalResults;
           this.loading = false;
         },
         error: (error) => {
@@ -95,11 +124,13 @@ export class SearchComponent implements OnInit {
     this.loading = true;
     this.searchService.getPopularShows(0, 12).subscribe({
       next: (response: SearchResponse) => {
-        this.searchResults = response.content;
+        this.searchResults = response.results;
         this.totalPages = response.totalPages;
-        this.totalElements = response.totalElements;
-        this.totalResults = response.totalElements;
+        this.totalElements = response.totalResults;
+        this.totalResults = response.totalResults;
         this.loading = false;
+        this.hasSearched = false;
+        this.searched = false;
       },
       error: (error) => {
         console.error('Error loading popular shows:', error);
@@ -108,10 +139,70 @@ export class SearchComponent implements OnInit {
     });
   }
 
+  loadRecentShows(): void {
+    this.loading = true;
+    this.searchService.getRecentShows(0, 12).subscribe({
+      next: (response: SearchResponse) => {
+        this.searchResults = response.results;
+        this.totalPages = response.totalPages;
+        this.totalElements = response.totalResults;
+        this.totalResults = response.totalResults;
+        this.loading = false;
+        this.hasSearched = false;
+        this.searched = false;
+      },
+      error: (error) => {
+        console.error('Error loading recent shows:', error);
+        this.loading = false;
+      }
+    });
+  }
+
+  loadPodcasts(): void {
+    this.loading = true;
+    this.searchService.getPodcasts(0, 12).subscribe({
+      next: (response: SearchResponse) => {
+        this.searchResults = response.results;
+        this.totalPages = response.totalPages;
+        this.totalElements = response.totalResults;
+        this.totalResults = response.totalResults;
+        this.loading = false;
+        this.hasSearched = false;
+        this.searched = false;
+      },
+      error: (error) => {
+        console.error('Error loading podcasts:', error);
+        this.loading = false;
+      }
+    });
+  }
+
+  loadDocumentaries(): void {
+    this.loading = true;
+    this.searchService.getDocumentaries(0, 12).subscribe({
+      next: (response: SearchResponse) => {
+        this.searchResults = response.results;
+        this.totalPages = response.totalPages;
+        this.totalElements = response.totalResults;
+        this.totalResults = response.totalResults;
+        this.loading = false;
+        this.hasSearched = false;
+        this.searched = false;
+      },
+      error: (error) => {
+        console.error('Error loading documentaries:', error);
+        this.loading = false;
+      }
+    });
+  }
+
   clearSearch(): void {
     this.searchForm.reset({
       sortBy: 'relevance',
-      pageSize: 20
+      sortDirection: 'desc',
+      pageSize: 20,
+      highlight: true,
+      fuzzy: true
     });
     this.hasSearched = false;
     this.searched = false;

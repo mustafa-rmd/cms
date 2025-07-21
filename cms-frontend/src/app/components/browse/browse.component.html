@@ -1,0 +1,491 @@
+<div class="container fade-in">
+  <!-- Hero Section -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <div class="jumbotron text-center">
+        <h1 class="display-4 mb-4 fade-in-up">
+          <i class="bi bi-collection-play me-2 floating"></i>استكشف المحتوى
+        </h1>
+        <p class="lead mb-4 fade-in-up" style="animation-delay: 0.2s;">
+          اكتشف مجموعة واسعة من البودكاست والأفلام الوثائقية المميزة
+        </p>
+        <hr class="my-4 fade-in-up" style="animation-delay: 0.4s;">
+        <p class="mb-4 fade-in-up" style="animation-delay: 0.6s;">
+          تصفح المحتوى حسب النوع أو الفئة أو العلامات
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content Type Navigation -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="mb-0">
+            <i class="bi bi-grid me-2"></i>أنواع المحتوى
+          </h3>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <div class="d-grid">
+                <a routerLink="/search" [queryParams]="{type: 'podcast'}" class="btn btn-outline-primary btn-lg">
+                  <i class="bi bi-mic me-2"></i>البودكاست
+                </a>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <div class="d-grid">
+                <a routerLink="/search" [queryParams]="{type: 'documentary'}" class="btn btn-outline-success btn-lg">
+                  <i class="bi bi-camera-video me-2"></i>الأفلام الوثائقية
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popular Shows Section -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center mb-4 fade-in-up">
+        <h2 class="mb-0">
+          <i class="bi bi-fire text-warning me-2 floating"></i>العروض الشائعة
+        </h2>
+        <div class="d-flex align-items-center gap-3">
+          <!-- View Mode Switcher -->
+          <div class="btn-group" role="group" aria-label="View mode switcher">
+            <button 
+              type="button" 
+              class="btn btn-outline-primary" 
+              [class.active]="viewMode === 'cards'"
+              (click)="setViewMode('cards')"
+              title="عرض البطاقات">
+              <i class="bi bi-grid-3x3-gap"></i>
+            </button>
+            <button 
+              type="button" 
+              class="btn btn-outline-primary" 
+              [class.active]="viewMode === 'table'"
+              (click)="setViewMode('table')"
+              title="عرض الجدول">
+              <i class="bi bi-table"></i>
+            </button>
+          </div>
+          <a routerLink="/search" class="btn btn-outline-primary fade-in-up" style="animation-delay: 0.2s;">
+            <i class="bi bi-arrow-left me-1"></i>عرض الكل
+          </a>
+        </div>
+      </div>
+      
+      <!-- Loading Spinner -->
+      <div *ngIf="loading.popular" class="text-center py-5">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">جاري التحميل...</span>
+        </div>
+      </div>
+
+      <!-- Card View -->
+      <div class="row" *ngIf="!loading.popular && viewMode === 'cards'">
+        <div class="col-lg-4 col-md-6 mb-4 stagger-item" *ngFor="let show of popularShows; let i = index">
+          <div class="card h-100 show-card" [style.animation-delay]="(i * 0.1) + 's'">
+            <div class="card-body d-flex flex-column">
+              <div class="mb-3">
+                <span class="badge bg-primary mb-2">{{ getTypeLabel(show.type) }}</span>
+                <span class="badge bg-secondary">{{ show.provider }}</span>
+                <span *ngIf="show.rating" class="badge bg-warning text-dark">
+                  <i class="bi bi-star-fill me-1"></i>{{ show.rating.toFixed(1) }}
+                </span>
+              </div>
+              <h5 class="card-title flex-grow-1">{{ show.title }}</h5>
+              <p class="card-text text-muted flex-grow-1">{{ show.description | slice:0:120 }}...</p>
+              <div class="mt-auto">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <small class="text-muted">
+                    <i class="bi bi-clock me-1"></i>{{ formatDuration(show.durationSec) }}
+                  </small>
+                  <small class="text-muted">
+                    <i class="bi bi-calendar me-1"></i>{{ formatDate(show.publishedAt) }}
+                  </small>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="badge bg-info">{{ show.language.toUpperCase() }}</span>
+                  <!-- Only show detail link for authenticated users -->
+                  <a *ngIf="isAuthenticated()" [routerLink]="['/shows', show.showId]" class="btn btn-primary btn-sm">
+                    <i class="bi bi-eye me-1"></i>عرض التفاصيل
+                  </a>
+                  <span *ngIf="!isAuthenticated()" class="text-muted small">
+                    <i class="bi bi-lock me-1"></i>تسجيل الدخول مطلوب
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table View -->
+      <div class="table-responsive" *ngIf="!loading.popular && viewMode === 'table'">
+        <table class="table table-hover">
+          <thead class="table-light">
+            <tr>
+              <th>العنوان</th>
+              <th>النوع</th>
+              <th>المزود</th>
+              <th>اللغة</th>
+              <th>المدة</th>
+              <th>التقييم</th>
+              <th>تاريخ النشر</th>
+              <th>الإجراءات</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let show of popularShows">
+              <td>
+                <div>
+                  <strong>{{ show.title }}</strong>
+                  <br>
+                  <small class="text-muted">{{ show.description | slice:0:80 }}...</small>
+                </div>
+              </td>
+              <td>
+                <span class="badge" [class]="show.type === 'podcast' ? 'bg-primary' : 'bg-success'">
+                  {{ getTypeLabel(show.type) }}
+                </span>
+              </td>
+              <td>
+                <span class="badge bg-secondary">{{ show.provider }}</span>
+              </td>
+              <td>
+                <span class="badge bg-info">{{ show.language.toUpperCase() }}</span>
+              </td>
+              <td>{{ formatDuration(show.durationSec) }}</td>
+              <td>
+                <span *ngIf="show.rating" class="badge bg-warning text-dark">
+                  <i class="bi bi-star-fill me-1"></i>{{ show.rating.toFixed(1) }}
+                </span>
+                <span *ngIf="!show.rating" class="text-muted">-</span>
+              </td>
+              <td>{{ formatDate(show.publishedAt) }}</td>
+              <td>
+                <a *ngIf="isAuthenticated()" [routerLink]="['/shows', show.showId]" class="btn btn-primary btn-sm">
+                  <i class="bi bi-eye me-1"></i>عرض
+                </a>
+                <span *ngIf="!isAuthenticated()" class="text-muted small">
+                  <i class="bi bi-lock me-1"></i>تسجيل الدخول
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Shows Section -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center mb-4 fade-in-up">
+        <h2 class="mb-0">
+          <i class="bi bi-clock-history text-info me-2 floating"></i>أحدث العروض
+        </h2>
+        <div class="d-flex align-items-center gap-3">
+          <!-- View Mode Switcher -->
+          <div class="btn-group" role="group" aria-label="View mode switcher">
+            <button 
+              type="button" 
+              class="btn btn-outline-primary" 
+              [class.active]="viewMode === 'cards'"
+              (click)="setViewMode('cards')"
+              title="عرض البطاقات">
+              <i class="bi bi-grid-3x3-gap"></i>
+            </button>
+            <button 
+              type="button" 
+              class="btn btn-outline-primary" 
+              [class.active]="viewMode === 'table'"
+              (click)="setViewMode('table')"
+              title="عرض الجدول">
+              <i class="bi bi-table"></i>
+            </button>
+          </div>
+          <a routerLink="/search" class="btn btn-outline-primary fade-in-up" style="animation-delay: 0.2s;">
+            <i class="bi bi-arrow-left me-1"></i>عرض الكل
+          </a>
+        </div>
+      </div>
+      
+      <!-- Loading Spinner -->
+      <div *ngIf="loading.recent" class="text-center py-5">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">جاري التحميل...</span>
+        </div>
+      </div>
+
+      <!-- Card View -->
+      <div class="row" *ngIf="!loading.recent && viewMode === 'cards'">
+        <div class="col-lg-4 col-md-6 mb-4 stagger-item" *ngFor="let show of recentShows; let i = index">
+          <div class="card h-100 show-card" [style.animation-delay]="(i * 0.1) + 's'">
+            <div class="card-body d-flex flex-column">
+              <div class="mb-3">
+                <span class="badge bg-primary mb-2">{{ getTypeLabel(show.type) }}</span>
+                <span class="badge bg-secondary">{{ show.provider }}</span>
+                <span *ngIf="show.rating" class="badge bg-warning text-dark">
+                  <i class="bi bi-star-fill me-1"></i>{{ show.rating.toFixed(1) }}
+                </span>
+              </div>
+              <h5 class="card-title flex-grow-1">{{ show.title }}</h5>
+              <p class="card-text text-muted flex-grow-1">{{ show.description | slice:0:120 }}...</p>
+              <div class="mt-auto">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <small class="text-muted">
+                    <i class="bi bi-clock me-1"></i>{{ formatDuration(show.durationSec) }}
+                  </small>
+                  <small class="text-muted">
+                    <i class="bi bi-calendar me-1"></i>{{ formatDate(show.publishedAt) }}
+                  </small>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="badge bg-info">{{ show.language.toUpperCase() }}</span>
+                  <!-- Only show detail link for authenticated users -->
+                  <a *ngIf="isAuthenticated()" [routerLink]="['/shows', show.showId]" class="btn btn-primary btn-sm">
+                    <i class="bi bi-eye me-1"></i>عرض التفاصيل
+                  </a>
+                  <span *ngIf="!isAuthenticated()" class="text-muted small">
+                    <i class="bi bi-lock me-1"></i>تسجيل الدخول مطلوب
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table View -->
+      <div class="table-responsive" *ngIf="!loading.recent && viewMode === 'table'">
+        <table class="table table-hover">
+          <thead class="table-light">
+            <tr>
+              <th>العنوان</th>
+              <th>النوع</th>
+              <th>المزود</th>
+              <th>اللغة</th>
+              <th>المدة</th>
+              <th>التقييم</th>
+              <th>تاريخ النشر</th>
+              <th>الإجراءات</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let show of recentShows">
+              <td>
+                <div>
+                  <strong>{{ show.title }}</strong>
+                  <br>
+                  <small class="text-muted">{{ show.description | slice:0:80 }}...</small>
+                </div>
+              </td>
+              <td>
+                <span class="badge" [class]="show.type === 'podcast' ? 'bg-primary' : 'bg-success'">
+                  {{ getTypeLabel(show.type) }}
+                </span>
+              </td>
+              <td>
+                <span class="badge bg-secondary">{{ show.provider }}</span>
+              </td>
+              <td>
+                <span class="badge bg-info">{{ show.language.toUpperCase() }}</span>
+              </td>
+              <td>{{ formatDuration(show.durationSec) }}</td>
+              <td>
+                <span *ngIf="show.rating" class="badge bg-warning text-dark">
+                  <i class="bi bi-star-fill me-1"></i>{{ show.rating.toFixed(1) }}
+                </span>
+                <span *ngIf="!show.rating" class="text-muted">-</span>
+              </td>
+              <td>{{ formatDate(show.publishedAt) }}</td>
+              <td>
+                <a *ngIf="isAuthenticated()" [routerLink]="['/shows', show.showId]" class="btn btn-primary btn-sm">
+                  <i class="bi bi-eye me-1"></i>عرض
+                </a>
+                <span *ngIf="!isAuthenticated()" class="text-muted small">
+                  <i class="bi bi-lock me-1"></i>تسجيل الدخول
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content by Type -->
+  <div class="row mb-5">
+    <!-- Podcasts -->
+    <div class="col-lg-6 mb-4">
+      <div class="card h-100">
+        <div class="card-header">
+          <h4 class="mb-0">
+            <i class="bi bi-mic text-primary me-2"></i>البودكاست
+          </h4>
+        </div>
+        <div class="card-body">
+          <!-- Loading Spinner -->
+          <div *ngIf="loading.podcasts" class="text-center py-3">
+            <div class="spinner-border spinner-border-sm" role="status">
+              <span class="visually-hidden">جاري التحميل...</span>
+            </div>
+          </div>
+
+          <!-- Podcast List -->
+          <div *ngIf="!loading.podcasts">
+            <div class="mb-3" *ngFor="let show of podcasts; let last = last">
+              <div class="d-flex align-items-start">
+                <div class="flex-grow-1">
+                  <h6 class="mb-1">{{ show.title }}</h6>
+                  <p class="text-muted small mb-1">{{ show.description | slice:0:80 }}...</p>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                      <i class="bi bi-clock me-1"></i>{{ formatDuration(show.durationSec) }}
+                    </small>
+                    <a *ngIf="isAuthenticated()" [routerLink]="['/shows', show.showId]" class="btn btn-sm btn-outline-primary">
+                      عرض
+                    </a>
+                    <span *ngIf="!isAuthenticated()" class="text-muted small">
+                      <i class="bi bi-lock me-1"></i>تسجيل الدخول
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <hr *ngIf="!last">
+            </div>
+          </div>
+          
+          <div class="text-center mt-3">
+            <a routerLink="/search" [queryParams]="{type: 'podcast'}" class="btn btn-outline-primary">
+              <i class="bi bi-arrow-left me-1"></i>عرض جميع البودكاست
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Documentaries -->
+    <div class="col-lg-6 mb-4">
+      <div class="card h-100">
+        <div class="card-header">
+          <h4 class="mb-0">
+            <i class="bi bi-camera-video text-success me-2"></i>الأفلام الوثائقية
+          </h4>
+        </div>
+        <div class="card-body">
+          <!-- Loading Spinner -->
+          <div *ngIf="loading.documentaries" class="text-center py-3">
+            <div class="spinner-border spinner-border-sm" role="status">
+              <span class="visually-hidden">جاري التحميل...</span>
+            </div>
+          </div>
+
+          <!-- Documentary List -->
+          <div *ngIf="!loading.documentaries">
+            <div class="mb-3" *ngFor="let show of documentaries; let last = last">
+              <div class="d-flex align-items-start">
+                <div class="flex-grow-1">
+                  <h6 class="mb-1">{{ show.title }}</h6>
+                  <p class="text-muted small mb-1">{{ show.description | slice:0:80 }}...</p>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                      <i class="bi bi-clock me-1"></i>{{ formatDuration(show.durationSec) }}
+                    </small>
+                    <a *ngIf="isAuthenticated()" [routerLink]="['/shows', show.showId]" class="btn btn-sm btn-outline-success">
+                      عرض
+                    </a>
+                    <span *ngIf="!isAuthenticated()" class="text-muted small">
+                      <i class="bi bi-lock me-1"></i>تسجيل الدخول
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <hr *ngIf="!last">
+            </div>
+          </div>
+          
+          <div class="text-center mt-3">
+            <a routerLink="/search" [queryParams]="{type: 'documentary'}" class="btn btn-outline-success">
+              <i class="bi bi-arrow-left me-1"></i>عرض جميع الأفلام الوثائقية
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popular Tags -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="mb-0">
+            <i class="bi bi-tags me-2"></i>العلامات الشائعة
+          </h3>
+        </div>
+        <div class="card-body">
+          <div class="d-flex flex-wrap gap-2">
+            <a *ngFor="let tag of popularTags" 
+               routerLink="/search" 
+               [queryParams]="{tags: tag}"
+               class="btn btn-outline-secondary btn-sm">
+              <i class="bi bi-tag me-1"></i>{{ tag }}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popular Categories -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="mb-0">
+            <i class="bi bi-collection me-2"></i>الفئات الشائعة
+          </h3>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-4 mb-3" *ngFor="let category of popularCategories">
+              <a routerLink="/search" 
+                 [queryParams]="{categories: category}"
+                 class="btn btn-outline-primary w-100">
+                <i class="bi bi-folder me-2"></i>{{ category }}
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Login Prompt for Unauthenticated Users -->
+  <div class="row" *ngIf="!isAuthenticated()">
+    <div class="col-12">
+      <div class="card text-center border-primary">
+        <div class="card-body">
+          <h3 class="card-title text-primary">
+            <i class="bi bi-lock me-2"></i>تسجيل الدخول مطلوب
+          </h3>
+          <p class="card-text">
+            للوصول إلى تفاصيل المحتوى الكاملة وإدارة المحتوى، يرجى تسجيل الدخول إلى حسابك.
+          </p>
+          <a routerLink="/login" class="btn btn-primary btn-lg">
+            <i class="bi bi-box-arrow-in-right me-2"></i>تسجيل الدخول
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 
